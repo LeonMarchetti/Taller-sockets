@@ -71,3 +71,40 @@ Accept-Ranges: bytes
 Date: Thu, 01 Mar 2018 02:26:03 GMT
 Via: 1.1 varnish
 Connection: keep-alive
+[http://www.google.com/]
+HTTP/1.1 302 Found
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Referrer-Policy: no-referrer
+Location: http://www.google.com.ar/?gfe_rd=cr&dcr=0&ei=s2qXWrKKC66h8weyhrKQBg
+Content-Length: 272
+Date: Thu, 01 Mar 2018 02:51:31 GMT
+[http://www.unlu.edu.ar/]
+HTTP/1.1 400 Bad Request
+Date: Thu, 01 Mar 2018 02:51:38 GMT
+Server: Apache/2.4.10 (Debian)
+Content-Length: 307
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[http://www.iana.org/about/]
+HTTP/1.1 302 FOUND
+Date: Thu, 01 Mar 2018 02:52:10 GMT
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy: upgrade-insecure-requests
+Location: http://www.iana.org/about
+Cache-Control: max-age=3600
+Expires: Thu, 01 Mar 2018 03:52:10 GMT
+Content-Length: 0
+Content-Type: text/html; charset=utf-8
+Server: Apache
+Strict-Transport-Security: max-age=47304003; preload
+X-Cache-Hits: 0
+Connection: keep-alive
+[http://www.google.com/]
+HTTP/1.1 302 Found
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Referrer-Policy: no-referrer
+Location: http://www.google.com.ar/?gfe_rd=cr&dcr=0&ei=_0WYWpK2Hozj8AeJ1r_YCg
+Content-Length: 272
+Date: Thu, 01 Mar 2018 18:27:11 GMT

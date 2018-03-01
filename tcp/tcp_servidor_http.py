@@ -1,3 +1,4 @@
+# coding=utf-8
 from getopt import getopt, GetoptError
 from mimetypes import guess_type
 from os.path import isfile
@@ -6,16 +7,18 @@ import socket
 from sys import argv
 from time import localtime, strftime
 
+
 class ConexionTerminadaExcepcion(Exception):
     pass
 
+
 # Valores por defecto para host y puerto:
-HOST   = 'localhost'
-PORT   = 65000
+HOST = 'localhost'
+PORT = 65000
 BUFFER = 1024
 
-def buscar_recurso(recurso):
 
+def buscar_recurso(recurso):
     # Busco el archivo:
     archivo = 'paginas/' + recurso
     if isfile(archivo):
@@ -23,7 +26,7 @@ def buscar_recurso(recurso):
     else:
         status = 'HTTP/1.0 404 No encontrado\r\n'
         archivo = 'paginas/no_encontrado.html'
-        
+
     # Cabeceras de HTTP:
     fecha = 'Date: {}\r\n'.format(strftime('%a, %d %b %Y %H:%M:%S %Z', localtime()))
     tipo_contenido = 'Content-Type: {};charset=utf-8\r\n'.format(guess_type(recurso)[0])
@@ -37,12 +40,12 @@ def buscar_recurso(recurso):
     # Armo la respuesta:
     return status.encode() + fecha.encode() + tipo_contenido.encode() + b'\r\n' + html
 
-def procesar(pedido):
 
+def procesar(pedido):
     # Parseo la primera línea del pedido
     crlf = pedido.find('\r\n')
     primera_linea = pedido[:crlf]
-    
+
     print('Recibido: "{}"'.format(primera_linea))
 
     # Busco el recurso y obtengo la respuesta armada
@@ -51,6 +54,7 @@ def procesar(pedido):
         return buscar_recurso(recurso.group(2))
     else:
         raise Exception('Regex equivocado')
+
 
 def enviar(s, mensaje):
     try:
@@ -63,6 +67,7 @@ def enviar(s, mensaje):
         if enviado == 0:
             raise ConexionTerminadaExcepcion()
         b_mensaje = b_mensaje[enviado:]
+
 
 def recibir(s):
     cachos = []
@@ -79,6 +84,7 @@ def recibir(s):
             cachos.append(cacho)
 
     return ''.join([cacho.decode() for cacho in cachos])
+
 
 def server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as servidor:
@@ -109,15 +115,16 @@ def server():
         except KeyboardInterrupt:
             print('Programa terminado')
 
+
 if __name__ == '__main__':
     try:
         # Parámetros de la línea de comandos:
         opts, _ = getopt(argv[1:], 'i:p:')
 
         for opt, arg in opts:
-            if opt == '-i': # Dirección IP
+            if opt == '-i':  # Dirección IP
                 HOST = arg
-            elif opt == '-p': # Puerto
+            elif opt == '-p':  # Puerto
                 PORT = int(arg)
 
         server()

@@ -1,19 +1,24 @@
+# coding=utf-8
 import getopt
 import socket
 import subprocess
 import sys
 
+
 class ArgExcepcion(Exception):
     pass
+
 
 class ConexionTerminadaExcepcion(Exception):
     pass
 
+
 # Valores por defecto para host y puerto:
-HOST      = 'localhost'
-PORT      = 65000
-BUFFER    = 1024
+HOST = 'localhost'
+PORT = 65000
+BUFFER = 1024
 SEPARADOR = b'\\'
+
 
 def ejecutar_comando(comando):
     lista_comando = comando.split(' ')
@@ -28,11 +33,13 @@ def ejecutar_comando(comando):
             resultado += b'\r\n' + cp.stderr
         return resultado
 
-    except subprocess.CalledProcessError as e:
-        print('Error: \n{}'.format(e.output))
+    except subprocess.CalledProcessError as error:
+        print('Error: \n{}'.format(error.output))
+
 
 def ingresar_comando():
     return input('>>> ')
+
 
 def enviar(s, mensaje):
     try:
@@ -45,6 +52,7 @@ def enviar(s, mensaje):
         if enviado == 0:
             raise ConexionTerminadaExcepcion()
         b_mensaje = b_mensaje[enviado:]
+
 
 def recibir(s):
     cachos = []
@@ -63,6 +71,7 @@ def recibir(s):
 
     return ''.join([cacho.decode() for cacho in cachos])
 
+
 def server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as servidor:
         servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -72,9 +81,9 @@ def server():
 
         try:
             while True:
-                print('Esperando conexion...')
+                print('Esperando conexión...')
                 cliente, direccion = servidor.accept()
-                print('Conexion establecida: <{}:{}>'.format(direccion[0], direccion[1]))
+                print('Conexión establecida: <{}:{}>'.format(direccion[0], direccion[1]))
                 try:
                     while True:
                         # Recibir comando:
@@ -86,11 +95,12 @@ def server():
                         enviar(cliente, resultado)
 
                 except ConexionTerminadaExcepcion:
-                    print('Conexion terminada')
+                    print('Conexión terminada')
                 finally:
                     cliente.close()
         except KeyboardInterrupt:
             print('Programa terminado')
+
 
 def client():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as servidor:
@@ -108,27 +118,28 @@ def client():
         except ConexionTerminadaExcepcion:
             pass
 
+
 if __name__ == '__main__':
     try:
-        # Parametros de la linea de comandos:
+        # Parámetros de la línea de comandos:
         opts, _ = getopt.getopt(sys.argv[1:], 'csi:p:')
 
         modo = ''
 
         for opt, arg in opts:
-            if opt == '-c': # Modo Cliente
+            if opt == '-c':  # Modo Cliente
                 if modo == '':
                     modo = 'c'
                 else:
                     raise ArgExcepcion('Error... no se puede ser cliente y servidor al mismo tiempo!')
-            elif opt == '-s': # Modo Servidor
+            elif opt == '-s':  # Modo Servidor
                 if modo == '':
                     modo = 's'
                 else:
                     raise ArgExcepcion('Error... no se puede ser cliente y servidor al mismo tiempo!')
-            elif opt == '-i': # Direccion IP
+            elif opt == '-i':  # Dirección IP
                 HOST = arg
-            elif opt == '-p': # Puerto
+            elif opt == '-p':  # Puerto
                 PORT = int(arg)
 
         if modo == '':
@@ -139,7 +150,6 @@ if __name__ == '__main__':
             client()
 
     except getopt.GetoptError:
-        print('Error con los parametros: ' + str(sys.argv))
+        print('Error con los parámetros: ' + str(sys.argv))
     except ArgExcepcion as e:
         print('{}'.format(e))
-
