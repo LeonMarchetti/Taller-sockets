@@ -1,64 +1,57 @@
 # coding=utf-8
-
 import re
 import socket
 from urllib.parse import urlparse
 
+
+class ConexionTerminadaExcepcion(Exception):
+    pass
+
+
 class MiExcepcion(Exception):
     pass
+
 
 BUFFER = 1024
 # PROXY = '151.80.159.18'
 PROXY = '201.76.9.56'
 
-DEBUG = True
 
 def enviar(s, mensaje):
     while mensaje:
         n = s.send(mensaje)
         mensaje = mensaje[n:]
 
-    # def recibir(s):
-    # cachos = []
-    # while True:
-    # cacho = s.recv(BUFFER)
-    # if (cacho == b''):
-    # raise Exception('Conexión terminada')
-    # if (cacho.find(b'</html>') > -1) or (cacho.find(b'</HTML>') > -1):
-    # cachos.append(cacho)
-    # break
-
-    # cachos.append(cacho)
-
-    # return b''.join([cacho for cacho in cachos])
 
 def recibir(s):
-    mensaje = b''
+    content_length = 0
+    datos = b''
     while True:
-        recv = s.recv(BUFFER)
-        mensaje += recv
-        if len(recv) < BUFFER:
-            break
+        # Recibo datos del stream
+        cacho = s.recv(BUFFER)
+        if not cacho:
+            return datos
 
-    return mensaje
+        datos += cacho
 
-# def recibir(s):
-# cacho = s.recv(BUFFER)
-# longitud = 0
+        # Busco el límite de la cabecera
+        f = datos.find(b'\r\n\r\n')
+        if f > -1:
+            if content_length:
+                # Si tengo el content-length, sigo recibiendo datos hasta que
+                # el total de bytes recibido sea el largo del header + el largo
+                # del contenido
+                if len(datos) >= f + content_length:
+                    return datos
+            else:
+                # Busco el Content-Length:
+                lista_headers = datos[:f].decode().split('\r\n')
+                for header in lista_headers:
+                    match = re.match(r'^Content-Length: (\d+)$', header)
+                    if match:
+                        content_length = int(match.group(1))
+                        break
 
-# f = cacho.find(b'\r\n\r\n')
-# if f > -1:
-# lista_headers = cacho[:f].decode().split('\r\n')
-# for header in lista_headers:
-# match = re.match(r'^Content-Length: (\d+)$', header)
-# if match:
-# longitud = int(match.group(0))
-
-# cuerpo = body[f+4:]
-# while longitud > len(cuerpo):
-# cuerpo += s.recv(BUFFER)
-
-# return lista_headers + b'\r\n\r\n' cuerpo
 
 def GET(url, proxy=None):
     if proxy:
@@ -67,13 +60,13 @@ def GET(url, proxy=None):
     else:
         if url.find('//') == -1:
             url = '//' + url
-
+            
         url_obj = urlparse(url)
 
         get_path = url_obj.path
         if get_path == '':
             get_path = '/'
-
+            
         HOST = url_obj.netloc
 
     PORT = 80
@@ -82,10 +75,20 @@ def GET(url, proxy=None):
         servidor.connect((HOST, PORT))
 
         # Enviar pedido:
-        enviar(servidor, 'GET {} HTTP/1.1\r\n\r\n'.format(get_path).encode())
+        pedido = armar_pedido(get_path, url_obj.netloc)
+        enviar(servidor, pedido)
+        respuesta = recibir(servidor)
 
         # Recibir respuesta HTTP:
-        return recibir(servidor)
+        return respuesta
+
+
+def armar_pedido(pedido, nombre_host):
+    get_linea = 'GET {} HTTP/1.1\r\n'.format(pedido)
+    conn_linea = 'Connection: close\r\n'
+    host_linea = 'Host: {}\r\n'.format(nombre_host)
+    return get_linea.encode() + host_linea.encode() + conn_linea.encode() + b'\r\n'
+
 
 def parsear_http(mensaje):
     # Separar encabezado de html:
@@ -95,20 +98,24 @@ def parsear_http(mensaje):
 
     return http_resp[:s], http_resp[s + 4:]
 
+
 def log_header_http(url, header):
     str_header = header.decode().replace('\r\n', '\n') + '\r\n'
     log = '[{0}]\n{1}'.format(url, str_header)
     with open('log.txt', 'a') as f:
         f.write(log)
 
+
 def guardar(mensaje):
     # Guardar contenido html en archivo:
     with open('paginas/tmp.html', 'wb') as f:
         f.write(mensaje)
 
+
 def mostrar_resultado_http(header):
     resultado = header[:header.find(b'\r\n')]
     print(resultado.decode())
+
 
 if __name__ == '__main__':
     try:
@@ -117,10 +124,7 @@ if __name__ == '__main__':
         if url == '':
             raise MiExcepcion('Salir')
 
-        url = 'http://{}/'.format(url)
-
         usar_proxy = input('Usar proxy? (s/n) > ')
-
         if usar_proxy in 'sS':
             proxy = PROXY
         elif usar_proxy in 'nN':
