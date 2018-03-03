@@ -108,3 +108,38 @@ Referrer-Policy: no-referrer
 Location: http://www.google.com.ar/?gfe_rd=cr&dcr=0&ei=_0WYWpK2Hozj8AeJ1r_YCg
 Content-Length: 272
 Date: Thu, 01 Mar 2018 18:27:11 GMT
+[http://www.google.com/]
+
+[http://www.google.com/]
+
+[http://www.unlu.edu.ar/]
+HTTP/1.1 400 Bad Request
+Date: Sat, 03 Mar 2018 02:50:12 GMT
+Server: Apache/2.4.10 (Debian)
+Content-Length: 307
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[http://www.unlu.edu.ar/]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 02:51:25 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[http://www.unlu.edu.ar/institucional.html/]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 03:02:26 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 03:16:02 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
