@@ -1,26 +1,22 @@
 # coding=utf-8
-import re
+from re import match
 import socket
 from urllib.parse import urlparse
 
-
-class ConexionTerminadaExcepcion(Exception):
-    pass
-
-
-class MiExcepcion(Exception):
-    pass
-
-
 BUFFER = 1024
+
 # PROXY = '151.80.159.18'
-PROXY = '201.76.9.56'
+# PROXY = '201.76.9.56'
+# PROXY = '103.10.52.83'
+# PROXY = '185.71.80.3' # Conexion rechazada
+
+PROXY = ('89.236.17.108', 3128)
 
 
-def enviar(s, mensaje):
-    while mensaje:
-        n = s.send(mensaje)
-        mensaje = mensaje[n:]
+def enviar(s, datos):
+    while datos:
+        enviado = s.send(datos)
+        datos = datos[enviado:]
 
 
 def recibir(s):
@@ -47,47 +43,57 @@ def recibir(s):
                 # Busco el Content-Length:
                 lista_headers = datos[:f].decode().split('\r\n')
                 for header in lista_headers:
-                    match = re.match(r'^Content-Length: (\d+)$', header)
-                    if match:
-                        content_length = int(match.group(1))
+                    cl_match = match(r'^Content-Length: (\d+)$', header)
+                    if cl_match:
+                        content_length = int(cl_match.group(1))
                         break
 
 
-def GET(url, proxy=None):
+def GET(url, proxy=False):
+
+    if not match(r'^https?:\/\/', url):
+        url = 'http://' + url
+
+    url_obj = urlparse(url)
+    
+    dominio = url_obj.netloc
+
     if proxy:
-        HOST = proxy
-        get_path = url
+        direccion = PROXY
+        request_uri = url
     else:
-        if url.find('//') == -1:
-            url = '//' + url
-            
-        url_obj = urlparse(url)
+        direccion = (dominio, 80)
 
-        get_path = url_obj.path
-        if get_path == '':
-            get_path = '/'
-            
-        HOST = url_obj.netloc
-
-    PORT = 80
+        request_uri = url_obj.path
+        if request_uri == '':
+            request_uri = '/'
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as servidor:
-        servidor.connect((HOST, PORT))
+        servidor.connect(direccion)
 
         # Enviar pedido:
-        pedido = armar_pedido(get_path, url_obj.netloc)
+        pedido = armar_pedido(request_uri, dominio)
         enviar(servidor, pedido)
+
         respuesta = recibir(servidor)
 
         # Recibir respuesta HTTP:
         return respuesta
 
 
-def armar_pedido(pedido, nombre_host):
-    get_linea = 'GET {} HTTP/1.1\r\n'.format(pedido)
+def armar_pedido(uri, nombre_host):
+    get_linea = 'GET {} HTTP/1.1\r\n'.format(uri)
+    print(get_linea.replace('\r\n', ''))
+    
     conn_linea = 'Connection: close\r\n'
-    host_linea = 'Host: {}\r\n'.format(nombre_host)
-    return get_linea.encode() + host_linea.encode() + conn_linea.encode() + b'\r\n'
+    
+    if nombre_host:
+        host_linea = 'Host: {}\r\n'.format(nombre_host)
+    else:
+        host_linea = ''
+        
+    pedido = get_linea + host_linea + conn_linea + '\r\n'
+    return pedido.encode()
 
 
 def parsear_http(mensaje):
@@ -122,18 +128,16 @@ if __name__ == '__main__':
         print('Ingrese pagina a buscar:')
         url = input('> ')
         if url == '':
-            raise MiExcepcion('Salir')
+            quit()
 
         usar_proxy = input('Usar proxy? (s/n) > ')
         if usar_proxy in 'sS':
-            proxy = PROXY
+            http_resp = GET(url, True)
         elif usar_proxy in 'nN':
-            proxy = None
+            http_resp = GET(url)
         else:
-            raise MiExcepcion('Salir')
-
-        http_resp = GET(url, proxy)
-
+            quit()
+            
         header, html = parsear_http(http_resp)
 
         guardar(html)
@@ -142,7 +146,5 @@ if __name__ == '__main__':
 
     except ConnectionRefusedError:
         print('Conexión rechazada...')
-    except MiExcepcion as e:
-        print('{}'.format(e))
     except TimeoutError:
         print('Tiempo agotado.')
