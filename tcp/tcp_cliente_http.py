@@ -1,7 +1,7 @@
 # coding=utf-8
 import os
 import os.path
-from re import compile, findall, match, search
+import re
 import socket
 from urllib.parse import urlparse
 
@@ -45,7 +45,7 @@ def recibir(s):
                 # Busco el Content-Length:
                 lista_headers = datos[:f].decode().split('\r\n')
                 for header in lista_headers:
-                    cl_match = match(r'^Content-Length: (\d+)$', header)
+                    cl_match = re.match(r'^Content-Length: (\d+)$', header)
                     if cl_match:
                         content_length = int(cl_match[1])
                         break
@@ -53,7 +53,7 @@ def recibir(s):
 
 def parsear_url(url):
     # Formateo la url ingresada:
-    if not match(r'^https?:\/\/', url):
+    if not re.match(r'^https?:\/\/', url):
         url = 'http://' + url
 
     oURL = urlparse(url)
@@ -99,7 +99,7 @@ def GET(absolute_host, host, recurso, proxy=False):
         # Obtengo el código de estado:
         linea_estado = respuesta[:respuesta.find(b'\r\n')].decode('ISO-8859-1')
         print(linea_estado)
-        codigo = int(match(r'^HTTP/\d\.\d (\d{3}) [\w ]+$', linea_estado)[1])
+        codigo = int(re.match(r'^HTTP/\d\.\d (\d{3}) [\w ]+$', linea_estado)[1])
 
         return respuesta, codigo
 
@@ -141,7 +141,7 @@ def crear_carpeta(nombre_carpeta):
 
 
 def buscar_redireccion(header):
-    match_location = search(r'Location: (.*)\r\n', header)
+    match_location = re.search(r'Location: (.*)\r\n', header)
     if match_location:
         return match_location[1]
     else:
@@ -192,7 +192,7 @@ def main():
     html = http_body.decode('ISO-8859-1')
 
     # Busco el título de la pagina:
-    title_search = search(r'<title>\s*(.*)\s*</title>', html)
+    title_search = re.search(r'<title>\s*(.*)\s*</title>', html)
     if title_search:
         titulo = title_search[1]
     else:
@@ -208,8 +208,8 @@ def main():
     guardar(carpeta, titulo + '.html', http_body)
 
     # Busco las referencias externas en el html:
-    pattern = compile(r'(?:href|src)=\"([\w/-]*\.(\w*))\"')
-    for (nombre_archivo, ext) in findall(pattern, html):
+    pattern = re.compile(r'(?:href|src)=\"([\w/-]*\.(\w*))\"')
+    for (nombre_archivo, ext) in re.findall(pattern, html):
         if ext not in ('html'):
             # Hago un GET de todos los recursos, salvo los html y php:
             try:
