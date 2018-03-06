@@ -56,17 +56,10 @@ def procesar(pedido):
         raise Exception('Regex equivocado')
 
 
-def enviar(s, mensaje):
-    try:
-        b_mensaje = mensaje.encode()
-    except AttributeError:
-        b_mensaje = mensaje
-
-    while b_mensaje:
-        enviado = s.send(b_mensaje)
-        if enviado == 0:
-            raise ConexionTerminadaExcepcion()
-        b_mensaje = b_mensaje[enviado:]
+def enviar(s, datos):
+    while datos:
+        enviado = s.send(datos)
+        datos = datos[enviado:]
 
 
 def recibir(s):

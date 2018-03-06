@@ -1,5 +1,7 @@
 # coding=utf-8
-from re import match
+import os
+import os.path
+from re import compile, findall, match, search
 import socket
 from urllib.parse import urlparse
 
@@ -45,106 +47,183 @@ def recibir(s):
                 for header in lista_headers:
                     cl_match = match(r'^Content-Length: (\d+)$', header)
                     if cl_match:
-                        content_length = int(cl_match.group(1))
+                        content_length = int(cl_match[1])
                         break
 
 
-def GET(url, proxy=False):
-
+def parsear_url(url):
+    # Formateo la url ingresada:
     if not match(r'^https?:\/\/', url):
         url = 'http://' + url
 
-    url_obj = urlparse(url)
-    
-    dominio = url_obj.netloc
+    oURL = urlparse(url)
 
+    absolute_host = oURL.scheme + '://' + oURL.netloc
+
+    host = oURL.netloc
+
+    pagina = oURL.path
+    if pagina == '':
+        pagina = '/'
+
+    return absolute_host, host, pagina
+
+
+def GET(absolute_host, host, recurso, proxy=False):
+    # Elijo la dirección y puerto a la que me voy a conectar según si uso un
+    # proxy o no:
     if proxy:
         direccion = PROXY
-        request_uri = url
+        request_uri = absolute_host + recurso
     else:
-        direccion = (dominio, 80)
+        direccion = (host, 80)
+        request_uri = recurso
 
-        request_uri = url_obj.path
-        if request_uri == '':
-            request_uri = '/'
+    # Armo el pedido:
+    get_linea = 'GET {} HTTP/1.1\r\n'.format(request_uri)
+    print(get_linea.replace('\r\n', ''))
+    conn_linea = 'Connection: close\r\n'
+    host_linea = 'Host: {}\r\n'.format(host)
 
+    pedido = get_linea + host_linea + conn_linea + '\r\n'
+
+    # Abro la conexión con el servidor y envío el pedido:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as servidor:
         servidor.connect(direccion)
 
-        # Enviar pedido:
-        pedido = armar_pedido(request_uri, dominio)
-        enviar(servidor, pedido)
+        enviar(servidor, pedido.encode())
 
+        # Recibo la respuesta:
         respuesta = recibir(servidor)
 
-        # Recibir respuesta HTTP:
-        return respuesta
+        # Obtengo el código de estado:
+        linea_estado = respuesta[:respuesta.find(b'\r\n')].decode('ISO-8859-1')
+        print(linea_estado)
+        codigo = int(match(r'^HTTP/\d\.\d (\d{3}) [\w ]+$', linea_estado)[1])
 
-
-def armar_pedido(uri, nombre_host):
-    get_linea = 'GET {} HTTP/1.1\r\n'.format(uri)
-    print(get_linea.replace('\r\n', ''))
-    
-    conn_linea = 'Connection: close\r\n'
-    
-    if nombre_host:
-        host_linea = 'Host: {}\r\n'.format(nombre_host)
-    else:
-        host_linea = ''
-        
-    pedido = get_linea + host_linea + conn_linea + '\r\n'
-    return pedido.encode()
+        return respuesta, codigo
 
 
 def parsear_http(mensaje):
     # Separar encabezado de html:
-    s = http_resp.find(b'\r\n\r\n')
+    s = mensaje.find(b'\r\n\r\n')
     if s == -1:
-        raise Exception('E> No se encontro separador de HTTP')
+        raise Exception('Error: No se encontro separador de HTTP')
 
-    return http_resp[:s], http_resp[s + 4:]
-
-
-def log_header_http(url, header):
-    str_header = header.decode().replace('\r\n', '\n') + '\r\n'
-    log = '[{0}]\n{1}'.format(url, str_header)
-    with open('log.txt', 'a') as f:
-        f.write(log)
+    # return header, body
+    return mensaje[:s], mensaje[s + 4:]
 
 
-def guardar(mensaje):
-    # Guardar contenido html en archivo:
-    with open('paginas/tmp.html', 'wb') as f:
-        f.write(mensaje)
+def loggear_header(header, titulo):
+    # Guardo header en un archivo de log:
+    str_header = header.decode('ISO-8859-1').replace('\r\n', '\n') + '\r\n'
+    log = '[{0}]\n{1}'.format(titulo, str_header)
+    with open('paginas/log.txt', 'a') as archivo:
+        archivo.write(log)
 
 
-def mostrar_resultado_http(header):
-    resultado = header[:header.find(b'\r\n')]
-    print(resultado.decode())
+def guardar(carpeta, nombre_archivo, datos):
+    os.makedirs(os.path.dirname(carpeta + '/' + nombre_archivo), exist_ok=True)
+    with open(carpeta + '/' + nombre_archivo, 'wb') as archivo:
+        archivo.write(datos)
+
+
+def crear_carpeta(nombre_carpeta):
+    # Si ya se había guardado la página antes, se crea una carpeta con un
+    # nombre seguido de un número:
+    i = 2
+    nombre_base = nombre_carpeta
+    while os.path.isdir(nombre_carpeta):
+        nombre_carpeta = nombre_base + str(i)
+        i += 1
+
+    os.makedirs(nombre_carpeta)
+
+
+def buscar_redireccion(header):
+    match_location = search(r'Location: (.*)\r\n', header)
+    if match_location:
+        return match_location[1]
+    else:
+        raise Exception('Destino de redirección no encontrado...')
+
+
+def main():
+    print('Ingrese pagina a buscar:')
+    url = input('> ')
+    if url == '':
+        quit()
+
+    # Indico si quiero usar el proxy:
+    usar_proxy = input('Usar proxy? (s/n) > ')
+    if usar_proxy in 'sS':
+        proxy = True
+    elif usar_proxy in 'nN':
+        proxy = False
+    else:
+        quit()
+
+    while True:
+        absolute_host, host, pagina = parsear_url(url)
+
+        # Armo y envío el pedido al servidor, y obtengo la respuesta:
+        try:
+            http_resp, estado = GET(absolute_host, host, pagina, proxy)
+            if estado in (302):
+                # Si obtengo un mensaje de redirección, obtengo el nuevo
+                # destino y busco de vuelta
+                http_header, _ = parsear_http(http_resp)
+                url = buscar_redireccion(http_header.decode('ISO-8859-1'))
+                continue
+            else:
+                break
+        except ConnectionRefusedError:
+            print('Conexión rechazada...')
+            quit()
+        except TimeoutError:
+            print('Tiempo agotado para esta solicitud...')
+            quit()
+
+    # Separo header del cuerpo:
+    http_header, http_body = parsear_http(http_resp)
+
+    loggear_header(http_header, url)
+
+    html = http_body.decode('ISO-8859-1')
+
+    # Busco el título de la pagina:
+    title_search = search(r'<title>\s*(.*)\s*</title>', html)
+    if title_search:
+        titulo = title_search[1]
+    else:
+        print('Titulo no encontrado')
+        titulo = host + pagina
+    titulo = titulo.strip().replace(' ', '_')
+
+    # Creo la carpeta donde guardar la página:
+    carpeta = 'paginas/' + titulo
+
+    crear_carpeta(carpeta)
+
+    guardar(carpeta, titulo + '.html', http_body)
+
+    # Busco las referencias externas en el html:
+    pattern = compile(r'(?:href|src)=\"([\w/-]*\.(\w*))\"')
+    for (nombre_archivo, ext) in findall(pattern, html):
+        if ext not in ('html'):
+            # Hago un GET de todos los recursos, salvo los html y php:
+            try:
+                resp, _ = GET(absolute_host, host, '/' + nombre_archivo, proxy)
+            except ConnectionRefusedError:
+                print('Conexión rechazada...')
+                break
+            except TimeoutError:
+                print('Tiempo agotado para esta solicitud...')
+                continue
+
+            header, body = parsear_http(resp)
+            guardar(carpeta, nombre_archivo, body)
 
 
 if __name__ == '__main__':
-    try:
-        print('Ingrese pagina a buscar:')
-        url = input('> ')
-        if url == '':
-            quit()
-
-        usar_proxy = input('Usar proxy? (s/n) > ')
-        if usar_proxy in 'sS':
-            http_resp = GET(url, True)
-        elif usar_proxy in 'nN':
-            http_resp = GET(url)
-        else:
-            quit()
-            
-        header, html = parsear_http(http_resp)
-
-        guardar(html)
-        log_header_http(url, header)
-        mostrar_resultado_http(header)
-
-    except ConnectionRefusedError:
-        print('Conexión rechazada...')
-    except TimeoutError:
-        print('Tiempo agotado.')
+    main()

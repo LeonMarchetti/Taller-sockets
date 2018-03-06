@@ -1,0 +1,840 @@
+[http://www.google.com/]
+HTTP/1.1 302 Found
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Referrer-Policy: no-referrer
+Location: http://www.google.com.ar/?gfe_rd=cr&dcr=0&ei=gPyWWtHTI4Tj8AegsInwAg
+Content-Length: 272
+Date: Wed, 28 Feb 2018 19:01:20 GMT
+
+[http://www.unlu.edu.ar/]
+HTTP/1.1 400 Bad Request
+Date: Wed, 28 Feb 2018 19:01:28 GMT
+Server: Apache/2.4.10 (Debian)
+Content-Length: 307
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+
+[http://www.google.com.ar/]
+HTTP/1.1 302 Found
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Referrer-Policy: no-referrer
+Location: http://www.google.com.ar/?gfe_rd=cr&dcr=0&ei=3f-WWoSWIpHj8AftjoGoCA
+Content-Length: 272
+Date: Wed, 28 Feb 2018 19:15:41 GMT
+[http://www.unlu.edu.ar/]
+HTTP/1.1 400 Bad Request
+Date: Wed, 28 Feb 2018 19:25:47 GMT
+Server: Apache/2.4.10 (Debian)
+Content-Length: 307
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[http://www.google.com/]
+HTTP/1.1 302 Found
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Referrer-Policy: no-referrer
+Location: http://www.google.com.ar/?gfe_rd=cr&dcr=0&ei=V1aXWqCVIZDj8AePuLfYDg
+Content-Length: 272
+Date: Thu, 01 Mar 2018 01:24:39 GMT
+[http://www.unlu.edu.ar/]
+HTTP/1.1 400 Bad Request
+Date: Thu, 01 Mar 2018 01:32:22 GMT
+Server: Apache/2.4.10 (Debian)
+Content-Length: 307
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[https://docs.python.org/3/library/index.html]
+HTTP/1.1 500 Domain Not Found
+Server: Varnish
+Retry-After: 0
+content-type: text/html
+Cache-Control: private, no-cache
+connection: keep-alive
+X-Served-By: cache-gru17126-GRU
+Content-Length: 221
+Accept-Ranges: bytes
+Date: Thu, 01 Mar 2018 02:25:01 GMT
+Via: 1.1 varnish
+Connection: keep-alive
+[https://docs.python.org/3/library/index.html]
+HTTP/1.1 500 Domain Not Found
+Server: Varnish
+Retry-After: 0
+content-type: text/html
+Cache-Control: private, no-cache
+connection: keep-alive
+X-Served-By: cache-gru17135-GRU
+Content-Length: 221
+Accept-Ranges: bytes
+Date: Thu, 01 Mar 2018 02:26:03 GMT
+Via: 1.1 varnish
+Connection: keep-alive
+[http://www.google.com/]
+HTTP/1.1 302 Found
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Referrer-Policy: no-referrer
+Location: http://www.google.com.ar/?gfe_rd=cr&dcr=0&ei=s2qXWrKKC66h8weyhrKQBg
+Content-Length: 272
+Date: Thu, 01 Mar 2018 02:51:31 GMT
+[http://www.unlu.edu.ar/]
+HTTP/1.1 400 Bad Request
+Date: Thu, 01 Mar 2018 02:51:38 GMT
+Server: Apache/2.4.10 (Debian)
+Content-Length: 307
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[http://www.iana.org/about/]
+HTTP/1.1 302 FOUND
+Date: Thu, 01 Mar 2018 02:52:10 GMT
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy: upgrade-insecure-requests
+Location: http://www.iana.org/about
+Cache-Control: max-age=3600
+Expires: Thu, 01 Mar 2018 03:52:10 GMT
+Content-Length: 0
+Content-Type: text/html; charset=utf-8
+Server: Apache
+Strict-Transport-Security: max-age=47304003; preload
+X-Cache-Hits: 0
+Connection: keep-alive
+[http://www.google.com/]
+HTTP/1.1 302 Found
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Referrer-Policy: no-referrer
+Location: http://www.google.com.ar/?gfe_rd=cr&dcr=0&ei=_0WYWpK2Hozj8AeJ1r_YCg
+Content-Length: 272
+Date: Thu, 01 Mar 2018 18:27:11 GMT
+[http://www.unlu.edu.ar/]
+HTTP/1.1 400 Bad Request
+Date: Sat, 03 Mar 2018 02:50:12 GMT
+Server: Apache/2.4.10 (Debian)
+Content-Length: 307
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[http://www.unlu.edu.ar/]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 02:51:25 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[http://www.unlu.edu.ar/institucional.html/]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 03:02:26 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 03:16:02 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 404 Not Found
+Date: Sat, 03 Mar 2018 17:25:57 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 313
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 404 Not Found
+Date: Sat, 03 Mar 2018 17:27:54 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 297
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 400 Bad Request
+Date: Sat, 03 Mar 2018 17:31:28 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 314
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 400 Bad Request
+Date: Sat, 03 Mar 2018 17:48:46 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 314
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 404 Not Found
+Date: Sat, 03 Mar 2018 17:49:32 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 297
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 17:58:58 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 18:01:16 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 404 Not Found
+Date: Sat, 03 Mar 2018 18:03:50 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 297
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[http://www.tutorialesprogramacionya.com/bootstrap4ya/]
+HTTP/1.1 404 Not Found
+Date: Sat, 03 Mar 2018 18:06:06 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 309
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 404 Not Found
+Date: Sat, 03 Mar 2018 18:10:29 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 297
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 404 Not Found
+Date: Sat, 03 Mar 2018 18:10:48 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 297
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 404 Not Found
+Date: Sat, 03 Mar 2018 18:12:29 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 297
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 404 Not Found
+Date: Sat, 03 Mar 2018 18:13:15 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 297
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 18:13:27 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 400 Bad Request
+Date: Sat, 03 Mar 2018 18:14:02 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 307
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 404 Not Found
+Date: Sat, 03 Mar 2018 18:15:34 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 297
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar]
+HTTP/1.1 404 Not Found
+Date: Sat, 03 Mar 2018 18:15:56 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 279
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.google.com]
+HTTP/1.1 404 Not Found
+Date: Sat, 03 Mar 2018 18:20:15 GMT
+Server: Apache/2.2.22 (Debian)
+Vary: Accept-Encoding
+Content-Length: 278
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.google.com]
+HTTP/1.1 302 Found
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Referrer-Policy: no-referrer
+Location: http://www.google.se/?gfe_rd=cr&dcr=0&ei=V-iaWrmyMuixX7SIlqgM
+Content-Length: 266
+Date: Sat, 03 Mar 2018 18:24:23 GMT
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 18:24:51 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 18:25:59 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Sat, 03 Mar 2018 18:25:59 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 18:32:40 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.unlu.edu.ar]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 18:37:26 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.unlu.edu.ar]
+HTTP/1.1 400 Bad Request
+Date: Sat, 03 Mar 2018 18:37:32 GMT
+Server: Apache/2.4.10 (Debian)
+Content-Length: 307
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.google.com]
+HTTP/1.1 302 Found
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Referrer-Policy: no-referrer
+Location: http://www.google.com.ar/?gfe_rd=cr&dcr=0&ei=nO-aWuLKOoLj8AeA5LiACA
+Content-Length: 272
+Date: Sat, 03 Mar 2018 18:55:24 GMT
+Connection: close
+[www.unlu.edu.ar]
+HTTP/1.1 200 OK
+Date: Sat, 03 Mar 2018 18:55:30 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.unlu.edu.ar/sedes-centros.html]
+HTTP/1.1 400 Bad Request
+Server: squid/3.5.12
+Mime-Version: 1.0
+Date: Mon, 05 Mar 2018 01:22:33 GMT
+Content-Type: text/html;charset=utf-8
+Content-Length: 3629
+X-Squid-Error: ERR_INVALID_URL 0
+Vary: Accept-Language
+Content-Language: en
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: NONE from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 15:58:23 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.unlu.edu.ar]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 16:07:07 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/sedes-centros.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 16:15:23 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/autoridades.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 16:42:19 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 16:45:07 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/sedes-centros.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 18:01:30 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/autoridades.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 18:12:47 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/autoridades.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 18:13:01 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 18:26:10 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 19:57:00 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 19:57:29 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:00:29 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:01:05 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:03:39 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:04:40 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:05:34 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:07:54 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:13:27 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Mon, 05 Mar 2018 20:13:27 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:14:05 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Mon, 05 Mar 2018 20:14:05 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:14:58 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Mon, 05 Mar 2018 20:14:58 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:15:46 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:16:18 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:47:18 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 20:47:48 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:24:40 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:26:13 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:28:14 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:28:36 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:29:28 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:32:30 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Mon, 05 Mar 2018 21:32:30 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:34:04 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Mon, 05 Mar 2018 21:34:04 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:36:43 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Mon, 05 Mar 2018 21:36:43 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:37:31 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Mon, 05 Mar 2018 21:37:31 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:40:12 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Mon, 05 Mar 2018 21:40:12 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:49:46 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Mon, 05 Mar 2018 21:49:46 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:51:54 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Mon, 05 Mar 2018 21:51:54 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:55:06 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Mon, 05 Mar 2018 21:55:06 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Mon, 05 Mar 2018 21:59:43 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Mon, 05 Mar 2018 21:59:43 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Tue, 06 Mar 2018 00:31:56 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Tue, 06 Mar 2018 00:40:58 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Tue, 06 Mar 2018 00:41:58 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Tue, 06 Mar 2018 00:41:58 GMT
+Content-Length: 215572
+Content-Type: text/html
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.google.com]
+HTTP/1.1 302 Found
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Referrer-Policy: no-referrer
+Location: http://www.google.se/?gfe_rd=cr&dcr=0&ei=vQ2eWpqrCuqxX-yRkJgH
+Content-Length: 266
+Date: Tue, 06 Mar 2018 03:40:45 GMT
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.google.se/?gfe_rd=cr&dcr=0&ei=HOmeWs3xO-WxX6n8kYAB]
+HTTP/1.1 200 OK
+Date: Tue, 06 Mar 2018 19:16:46 GMT
+Expires: -1
+Cache-Control: private, max-age=0
+Content-Type: text/html; charset=ISO-8859-1
+P3P: CP="This is not a P3P policy! See g.co/p3phelp for more info."
+Server: gws
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Set-Cookie: 1P_JAR=2018-03-06-19; expires=Thu, 05-Apr-2018 19:16:46 GMT; path=/; domain=.google.se
+Set-Cookie: NID=125=ZuMdtujcfqJ266cLnhacT_px4v3z4QDDv5pQapQifD8g3wdIHNputo5p7vmtjXQJVOglItFA8Al_CVtk2tzvwv7-DpjJm6AwA0v-TmBBzBBQgLL7jXzRX2KjP5X2zogR; expires=Wed, 05-Sep-2018 19:16:46 GMT; path=/; domain=.google.se; HttpOnly
+Accept-Ranges: none
+Vary: Accept-Encoding
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[http://www.google.se/?gfe_rd=cr&dcr=0&ei=FeqeWrfnHpOBYMPyp7gI]
+HTTP/1.1 200 OK
+Date: Tue, 06 Mar 2018 19:20:54 GMT
+Expires: -1
+Cache-Control: private, max-age=0
+Content-Type: text/html; charset=ISO-8859-1
+P3P: CP="This is not a P3P policy! See g.co/p3phelp for more info."
+Server: gws
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Set-Cookie: 1P_JAR=2018-03-06-19; expires=Thu, 05-Apr-2018 19:20:54 GMT; path=/; domain=.google.se
+Set-Cookie: NID=125=iDmbaB7ABwbyYL8hPN478GP0u4zPNb6g9WUA2KeA6Ti_IF015VONeBdd3wInarzfexE8VYi29S3DRnaFkOasiB9w7fS6o7JXwtAFvSr2ufSkdtBni0SmMppHBd4y8k3k; expires=Wed, 05-Sep-2018 19:20:54 GMT; path=/; domain=.google.se; HttpOnly
+Accept-Ranges: none
+Vary: Accept-Encoding
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
