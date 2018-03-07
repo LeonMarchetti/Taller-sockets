@@ -13,11 +13,35 @@ class ConexionTerminadaExcepcion(Exception):
     pass
 
 
-# Valores por defecto para host y puerto:
-HOST = 'localhost'
-PORT = 65000
 BUFFER = 1024
 SEPARADOR = b'\\'
+
+
+def enviar(s, mensaje):
+    datos = mensaje + SEPARADOR
+    while datos:
+        enviado = s.send(datos)
+        if enviado == 0:
+            raise ConexionTerminadaExcepcion()
+        datos = datos[enviado:]
+
+
+def recibir(s):
+    cachos = []
+    while True:
+        cacho = s.recv(BUFFER)
+        if cacho == b'':
+            raise ConexionTerminadaExcepcion()
+
+        # Busco el separador en el cacho:
+        f = cacho.find(SEPARADOR)
+        if f > -1:
+            cachos.append(cacho[:f])
+            break
+        else:
+            cachos.append(cacho)
+
+    return b''.join([cacho for cacho in cachos])
 
 
 def ejecutar_comando(comando):
@@ -41,43 +65,12 @@ def ingresar_comando():
     return input('>>> ')
 
 
-def enviar(s, mensaje):
-    try:
-        b_mensaje = mensaje.encode() + SEPARADOR
-    except AttributeError:
-        b_mensaje = mensaje + SEPARADOR
-
-    while b_mensaje:
-        enviado = s.send(b_mensaje)
-        if enviado == 0:
-            raise ConexionTerminadaExcepcion()
-        b_mensaje = b_mensaje[enviado:]
-
-
-def recibir(s):
-    cachos = []
-    while True:
-        cacho = s.recv(BUFFER)
-        if cacho == b'':
-            raise ConexionTerminadaExcepcion()
-
-        # Busco el separador en el cacho:
-        f = cacho.find(SEPARADOR)
-        if f > -1:
-            cachos.append(cacho[:f])
-            break
-        else:
-            cachos.append(cacho)
-
-    return ''.join([cacho.decode() for cacho in cachos])
-
-
-def server():
+def server(host, port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as servidor:
         servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        servidor.bind((HOST, PORT))
+        servidor.bind((host, port))
         servidor.listen(5)
-        print('Escuchando en <{}:{}>'.format(HOST, PORT))
+        print('Escuchando en <{}:{}>'.format(host, port))
 
         try:
             while True:
@@ -87,12 +80,12 @@ def server():
                 try:
                     while True:
                         # Recibir comando:
-                        comando = recibir(cliente)
+                        comando = recibir(cliente).decode()
                         print('Recibido: <{}>'.format(comando))
                         resultado = ejecutar_comando(comando)
 
                         # Enviar resultado:
-                        enviar(cliente, resultado)
+                        enviar(cliente, resultado.encode())
 
                 except ConexionTerminadaExcepcion:
                     print('Conexión terminada')
@@ -102,29 +95,33 @@ def server():
             print('Programa terminado')
 
 
-def client():
+def client(host, port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as servidor:
-        servidor.connect((HOST, PORT))
+        servidor.connect((host, port))
         try:
             while True:
                 comando = ingresar_comando()
                 if comando:
-                    enviar(servidor, comando)
+                    enviar(servidor, comando.encode())
                 else:
                     break
 
-                print(recibir(servidor))
+                print(recibir(servidor).decode())
 
         except ConexionTerminadaExcepcion:
             pass
 
 
-if __name__ == '__main__':
+def main():
     try:
         # Parámetros de la línea de comandos:
         opts, _ = getopt.getopt(sys.argv[1:], 'csi:p:')
 
         modo = ''
+        
+        # Valores por defecto para host y puerto:
+        host = 'localhost'
+        port = 65000
 
         for opt, arg in opts:
             if opt == '-c':  # Modo Cliente
@@ -138,18 +135,22 @@ if __name__ == '__main__':
                 else:
                     raise ArgExcepcion('Error... no se puede ser cliente y servidor al mismo tiempo!')
             elif opt == '-i':  # Dirección IP
-                HOST = arg
+                host = arg
             elif opt == '-p':  # Puerto
-                PORT = int(arg)
+                port = int(arg)
 
         if modo == '':
             print('Usar "-c" para modo Cliente y "-s" para modo Servidor')
         elif modo == 's':
-            server()
+            server(host, port)
         elif modo == 'c':
-            client()
+            client(host, port)
 
     except getopt.GetoptError:
         print('Error con los parámetros: ' + str(sys.argv))
     except ArgExcepcion as e:
         print('{}'.format(e))
+
+
+if __name__ == '__main__':
+    main()
