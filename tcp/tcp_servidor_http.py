@@ -1,6 +1,6 @@
 # coding=utf-8
 from getopt import getopt, GetoptError
-from mimetypes import guess_type
+from mimetypes import guess_extension, guess_type
 from os.path import isfile
 from re import match
 import socket
@@ -12,39 +12,36 @@ class ConexionTerminadaExcepcion(Exception):
     pass
 
 
-# Valores por defecto para host y puerto:
-HOST = 'localhost'
-PORT = 65000
 BUFFER = 1024
 
 
 def buscar_recurso(recurso):
     # Busco el archivo:
     archivo = 'paginas/' + recurso
+    tipo_mime = guess_type(recurso)[0]
     if isfile(archivo):
         status = 'HTTP/1.0 200 OK\r\n'
     else:
         status = 'HTTP/1.0 404 No encontrado\r\n'
-        archivo = 'paginas/no_encontrado.html'
+        archivo = 'paginas/no_encontrado' + guess_extension(tipo_mime)
 
     # Cabeceras de HTTP:
     fecha = 'Date: {}\r\n'.format(strftime('%a, %d %b %Y %H:%M:%S %Z', localtime()))
-    tipo_contenido = 'Content-Type: {};charset=utf-8\r\n'.format(guess_type(recurso)[0])
+    tipo_contenido = 'Content-Type: {};charset=utf-8\r\n'.format(tipo_mime)
 
     # Abro el archivo del recurso
-    html = b''
+    body = b''
     with open(archivo, 'rb') as f:
         for linea in f:
-            html += linea
+            body += linea
 
     # Armo la respuesta:
-    return status.encode() + fecha.encode() + tipo_contenido.encode() + b'\r\n' + html
+    return status.encode() + fecha.encode() + tipo_contenido.encode() + b'\r\n' + body
 
 
 def procesar(pedido):
     # Parseo la primera línea del pedido
-    crlf = pedido.find('\r\n')
-    primera_linea = pedido[:crlf]
+    primera_linea = pedido[:pedido.find('\r\n')]
 
     print('Recibido: "{}"'.format(primera_linea))
 
@@ -79,12 +76,12 @@ def recibir(s):
     return ''.join([cacho.decode() for cacho in cachos])
 
 
-def server():
+def server(host, port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as servidor:
         servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        servidor.bind((HOST, PORT))
+        servidor.bind((host, port))
         servidor.listen(5)
-        print('Escuchando en <{}:{}>'.format(HOST, PORT))
+        print('Escuchando en <{}:{}>'.format(host, port))
 
         try:
             while True:
@@ -109,18 +106,26 @@ def server():
             print('Programa terminado')
 
 
-if __name__ == '__main__':
+def main():
     try:
         # Parámetros de la línea de comandos:
         opts, _ = getopt(argv[1:], 'i:p:')
 
+        # Valores por defecto para host y puerto:
+        host = 'localhost'
+        port = '65000'
+
         for opt, arg in opts:
             if opt == '-i':  # Dirección IP
-                HOST = arg
+                host = arg
             elif opt == '-p':  # Puerto
-                PORT = int(arg)
+                port = int(arg)
 
-        server()
+        server(host, port)
 
     except GetoptError:
         print('Error con los parámetros: ' + str(argv))
+
+
+if __name__ == '__main__':
+    main()
