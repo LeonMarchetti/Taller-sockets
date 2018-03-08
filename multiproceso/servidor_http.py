@@ -1,70 +1,184 @@
-﻿###########################################################################
-# Concurrent server - webserver3g.py                                      #
-#                                                                         #
-# Tested with Python 2.7.9 & Python 3.4 on Ubuntu 14.04 & Mac OS X        #
-###########################################################################
+﻿# coding=utf-8
 import errno
+from getopt import getopt, GetoptError
+from mimetypes import guess_extension, guess_type
 import os
+from os.path import isfile
+from re import match
 import signal
 import socket
+import subprocess
+from sys import argv
+from time import localtime, strftime
 
-SERVER_ADDRESS = (HOST, PORT) = '', 8888
-REQUEST_QUEUE_SIZE = 1024
+
+class ConexionTerminadaExcepcion(Exception):
+    pass
 
 
-def grim_reaper(signum, frame):
+BUFFER = 1024
+
+
+def guarderia(signum, frame):
     while True:
         try:
-            pid, status = os.waitpid(
-                -1,          # Wait for any child process
-                 os.WNOHANG  # Do not block and return EWOULDBLOCK error
+            pid, estado = os.waitpid(
+                -1,
+                 os.WNOHANG
             )
         except OSError:
             return
 
-        if pid == 0:  # no more zombies
+        if pid == 0:
             return
 
 
-def handle_request(client_connection):
-    request = client_connection.recv(1024)
-    print(request.decode())
-    http_response = b"""\
-HTTP/1.1 200 OK
+def buscar_recurso(recurso):
+    # Busco el archivo:
+    archivo = 'paginas/' + recurso
 
-Hello, World!
-"""
-    client_connection.sendall(http_response)
+    tipo_mime = guess_type(recurso)[0]
+    if tipo_mime is None:
+        tipo_mime = 'text/plain'
+
+    if isfile(archivo):
+        status = 'HTTP/1.0 200 OK\r\n'
+    else:
+        status = 'HTTP/1.0 404 No encontrado\r\n'
+        archivo = 'paginas/no_encontrado' + guess_extension(tipo_mime)
+
+    print('Enviando "{}"'.format(status))
+
+    # Cabeceras de HTTP:
+    fecha = 'Date: {}\r\n'.format(strftime('%a, %d %b %Y %H:%M:%S %Z', localtime()))
+    tipo_contenido = 'Content-Type: {};charset=utf-8\r\n'.format(tipo_mime)
+
+    # Abro el archivo del recurso
+    body = b''
+    with open(archivo, 'rb') as f:
+        for linea in f:
+            body += linea
+
+    # Armo la respuesta:
+    return status.encode() + fecha.encode() + tipo_contenido.encode() + b'\r\n' + body
 
 
-def serve_forever():
-    listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    listen_socket.bind(SERVER_ADDRESS)
-    listen_socket.listen(REQUEST_QUEUE_SIZE)
-    print('Serving HTTP on port {port} ...'.format(port=PORT))
+def procesar(pedido):
+    # Parseo la primera línea del pedido
+    primera_linea = pedido[:pedido.find('\r\n')]
 
-    signal.signal(signal.SIGCHLD, grim_reaper)
+    print('Recibido: "{}"'.format(primera_linea))
 
+    # Busco el recurso y obtengo la respuesta armada
+    recurso = match(r'^(GET|POST) \/(.*) HTTP\/(1\.0|1\.1|2\.0)$', primera_linea)
+    if recurso:
+        #~ return buscar_recurso(recurso[2])
+        return buscar_recurso(recurso.group(2)) # Para python < v3.6
+    else:
+        raise Exception('Regex equivocado')
+
+
+def enviar(s, datos):
+    while datos:
+        enviado = s.send(datos)
+        if enviado == 0:
+            raise ConexionTerminadaExcepcion()
+        datos = datos[enviado:]
+
+
+def recibir(s):
+    cachos = []
     while True:
-        try:
-            client_connection, client_address = listen_socket.accept()
-        except IOError as e:
-            code, msg = e.args
-            # restart 'accept' if it was interrupted
-            if code == errno.EINTR:
-                continue
-            else:
-                raise
+        cacho = s.recv(BUFFER)
+        if cacho == b'':
+            raise ConexionTerminadaExcepcion()
 
-        pid = os.fork()
-        if pid == 0:  # child
-            listen_socket.close()  # close child copy
-            handle_request(client_connection)
-            client_connection.close()
-            os._exit(0)
-        else:  # parent
-            client_connection.close()  # close parent copy and loop over
+        f = cacho.find(b'\r\n\r\n')
+        if f > -1:
+            cachos.append(cacho[:f])
+            break
+        else:
+            cachos.append(cacho)
+
+    return ''.join([cacho.decode() for cacho in cachos])
+
+
+def server(host, port):
+    try:
+        servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        servidor.bind((host, port))
+        servidor.listen(5)
+        print('Escuchando en <{}:{}>'.format(host, port))
+
+        signal.signal(signal.SIGCHLD, guarderia)
+
+        while True:
+            print('Esperando conexión...')
+            try:
+                cliente, direccion = servidor.accept()
+            except IOError as e:
+                codigo, msg = e.args
+                if codigo == errno.EINTR:
+                    continue
+                else:
+                    raise
+
+            pid = os.fork()
+            if pid == 0: # hijo
+                servidor.close()
+                #~ trabajador()
+
+                try:
+                    # Recibir pedido:
+                    pedido = recibir(cliente)
+                    resultado = procesar(pedido)
+
+                    # Enviar resultado:
+                    enviar(cliente, resultado)
+
+                except ConexionTerminadaExcepcion:
+                    print('Conexión terminada')
+                finally:
+                    print('Cerrando hijo...')
+                    cliente.close()
+                    os._exit(0)
+
+            else: # padre
+                print('Conexión establecida: <{}:{}> con subproceso <{}>'.format(direccion[0], direccion[1], pid))
+                cliente.close()
+
+
+    except KeyboardInterrupt:
+        print('Programa terminado')
+    finally:
+        servidor.close()
+
+
+def trabajador():
+    pass
+
+def main():
+    try:
+        # Parámetros de la línea de comandos:
+        opts, _ = getopt(argv[1:], 'i:p:')
+
+        # Valores por defecto para host y puerto:
+        #~ host = 'localhost'
+        host = '192.168.1.42'
+        port = 8000
+
+        for opt, arg in opts:
+            if opt == '-i':  # Dirección IP
+                host = arg
+            elif opt == '-p':  # Puerto
+                port = int(arg)
+
+        server(host, port)
+
+    except GetoptError:
+        print('Error con los parámetros: ' + str(argv))
+
 
 if __name__ == '__main__':
-    serve_forever()
+    main()
