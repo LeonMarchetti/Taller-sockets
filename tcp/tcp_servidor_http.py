@@ -49,6 +49,7 @@ def procesar(pedido):
     recurso = match(r'^(GET|POST) \/(.*) HTTP\/(1\.0|1\.1|2\.0)$', primera_linea)
     if recurso:
         return buscar_recurso(recurso[2])
+        # return buscar_recurso(recurso.group(2)) # Para Python < v3.6
     else:
         raise Exception('Regex equivocado')
 
