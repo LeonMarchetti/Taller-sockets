@@ -3,7 +3,7 @@ import errno
 from getopt import getopt, GetoptError
 from mimetypes import guess_extension, guess_type
 import os
-from os.path import isfile
+from os.path import isfile, splitext
 from re import match
 import signal
 import socket
@@ -17,6 +17,7 @@ class ConexionTerminadaExcepcion(Exception):
 
 
 BUFFER = 1024
+BAD_REQUEST = b'HTTP/1.1 400 Solicitud Incorrecta\r\n\r\n'
 
 
 def guarderia(signum, frame):
@@ -33,13 +34,19 @@ def guarderia(signum, frame):
             return
 
 
-def buscar_recurso(recurso):
+def ejecutar_php(script):
+    p = subprocess.Popen('php ' + script, shell=True, stdout=subprocess.PIPE)
+    return p.stdout.read()
+
+
+def buscar_recurso(recurso, datos):
     # Busco el archivo:
     archivo = 'paginas/' + recurso
 
     tipo_mime = guess_type(recurso)[0]
     if tipo_mime is None:
-        tipo_mime = 'text/plain'
+        #~ tipo_mime = 'text/plain'
+        tipo_mime = 'text/html'
 
     if isfile(archivo):
         status = 'HTTP/1.0 200 OK\r\n'
@@ -53,29 +60,43 @@ def buscar_recurso(recurso):
     fecha = 'Date: {}\r\n'.format(strftime('%a, %d %b %Y %H:%M:%S %Z', localtime()))
     tipo_contenido = 'Content-Type: {};charset=utf-8\r\n'.format(tipo_mime)
 
-    # Abro el archivo del recurso
-    body = b''
-    with open(archivo, 'rb') as f:
-        for linea in f:
-            body += linea
+    # Abro el archivo del recurso. Si es un archivo .php entonces lo ejecuto:
+    if splitext(archivo)[1] == '.php':
+        body = ejecutar_php(archivo)
+    else:
+        body = b''
+        with open(archivo, 'rb') as f:
+            for linea in f:
+                body += linea
 
     # Armo la respuesta:
     return status.encode() + fecha.encode() + tipo_contenido.encode() + b'\r\n' + body
 
 
-def procesar(pedido):
-    # Parseo la primera línea del pedido
-    primera_linea = pedido[:pedido.find('\r\n')]
+def procesar(mensaje):
+    # Parseo la primera línea del pedido, para obtener tipo de pedido y recurso
+    linea_pedido = mensaje[:mensaje.find('\r\n')]
 
-    print('Recibido: "{}"'.format(primera_linea))
+    print('Recibido: "{}"'.format(linea_pedido))
 
-    # Busco el recurso y obtengo la respuesta armada
-    recurso = match(r'^(GET|POST) \/(.*) HTTP\/(1\.0|1\.1|2\.0)$', primera_linea)
-    if recurso:
-        #~ return buscar_recurso(recurso[2])
-        return buscar_recurso(recurso.group(2)) # Para python < v3.6
+    pedido = match(r'^(GET|POST) \/(.*) HTTP\/(?:1\.0|1\.1|2\.0)$', linea_pedido)
+
+    if pedido:
+        if pedido.group(1) == 'GET':
+            uri = pedido.group(2)
+            qs = uri.find('?')
+            if qs == -1:
+                return buscar_recurso(uri, '')
+            else:
+                return buscar_recurso(uri[:qs], uri[qs+1:])
+            #~ return get(pedido.group(2))
+        elif pedido.group(1) == 'POST':
+            linea_vacia = mensaje.find('\r\n\r\n')
+            return buscar_recurso(pedido.group(2), mensaje[linea_vacia+4:])
+        else:
+            return BAD_REQUEST
     else:
-        raise Exception('Regex equivocado')
+        return BAD_REQUEST
 
 
 def enviar(s, datos):
