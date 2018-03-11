@@ -21,6 +21,11 @@ BAD_REQUEST = b'HTTP/1.1 400 Solicitud Incorrecta\r\n\r\n'
 
 
 def guarderia(signum, frame):
+    '''When a child process exits, the kernel sends a SIGCHLD signal. The
+    parent process can set up a signal handler to be asynchronously notified of
+    that SIGCHLD event and then it can wait for the child to collect its
+    termination status, thus preventing the zombie process from being left
+    around.'''
     while True:
         try:
             pid, estado = os.waitpid(-1, os.WNOHANG)
