@@ -1,15 +1,15 @@
 ﻿# coding=utf-8
 import errno
-from getopt import getopt, GetoptError
-from mimetypes import guess_extension, guess_type
+import getopt
+import mimetypes
 import os
-from os.path import isfile, splitext
-from re import match
+import os.path
+import re
 import signal
 import socket
 import subprocess
-from sys import argv
-from time import localtime, strftime
+import sys
+import time
 
 
 class ConexionTerminadaExcepcion(Exception):
@@ -23,10 +23,7 @@ BAD_REQUEST = b'HTTP/1.1 400 Solicitud Incorrecta\r\n\r\n'
 def guarderia(signum, frame):
     while True:
         try:
-            pid, estado = os.waitpid(
-                -1,
-                 os.WNOHANG
-            )
+            pid, estado = os.waitpid(-1, os.WNOHANG)
         except OSError:
             return
 
@@ -43,25 +40,26 @@ def buscar_recurso(recurso, datos):
     # Busco el archivo:
     archivo = 'paginas/' + recurso
 
-    tipo_mime = guess_type(recurso)[0]
+    tipo_mime = mimetypes.guess_type(recurso)[0]
     if tipo_mime is None:
-        #~ tipo_mime = 'text/plain'
         tipo_mime = 'text/html'
 
-    if isfile(archivo):
+    if os.path.isfile(archivo):
         status = 'HTTP/1.0 200 OK\r\n'
     else:
         status = 'HTTP/1.0 404 No encontrado\r\n'
-        archivo = 'paginas/no_encontrado' + guess_extension(tipo_mime)
+        archivo = ('paginas/no_encontrado' +
+                   mimetypes.guess_extension(tipo_mime))
 
     print('Enviando "{}"'.format(status))
 
     # Cabeceras de HTTP:
-    fecha = 'Date: {}\r\n'.format(strftime('%a, %d %b %Y %H:%M:%S %Z', localtime()))
+    fecha = 'Date: {}\r\n'.format(time.strftime('%a, %d %b %Y %H:%M:%S %Z',
+                                                time.localtime()))
     tipo_contenido = 'Content-Type: {};charset=utf-8\r\n'.format(tipo_mime)
 
     # Abro el archivo del recurso. Si es un archivo .php entonces lo ejecuto:
-    if splitext(archivo)[1] == '.php':
+    if os.path.splitext(archivo)[1] == '.php':
         body = ejecutar_php(archivo)
     else:
         body = b''
@@ -70,7 +68,11 @@ def buscar_recurso(recurso, datos):
                 body += linea
 
     # Armo la respuesta:
-    return status.encode() + fecha.encode() + tipo_contenido.encode() + b'\r\n' + body
+    return (status.encode() +
+            fecha.encode() +
+            tipo_contenido.encode() +
+            b'\r\n' +
+            body)
 
 
 def procesar(mensaje):
@@ -79,7 +81,8 @@ def procesar(mensaje):
 
     print('Recibido: "{}"'.format(linea_pedido))
 
-    pedido = match(r'^(GET|POST) \/(.*) HTTP\/(?:1\.0|1\.1|2\.0)$', linea_pedido)
+    pedido = re.match(r'^(GET|POST) \/(.*) HTTP\/(?:1\.0|1\.1|2\.0)$',
+                      linea_pedido)
 
     if pedido:
         if pedido.group(1) == 'GET':
@@ -89,7 +92,6 @@ def procesar(mensaje):
                 return buscar_recurso(uri, '')
             else:
                 return buscar_recurso(uri[:qs], uri[qs+1:])
-            #~ return get(pedido.group(2))
         elif pedido.group(1) == 'POST':
             linea_vacia = mensaje.find('\r\n\r\n')
             return buscar_recurso(pedido.group(2), mensaje[linea_vacia+4:])
@@ -145,30 +147,18 @@ def server(host, port):
                 else:
                     raise
 
+            # Forkeo el proceso: El hijo  se encarga de atender al cliente
             pid = os.fork()
-            if pid == 0: # hijo
+            if pid == 0:
                 servidor.close()
-                #~ trabajador()
-
-                try:
-                    # Recibir pedido:
-                    pedido = recibir(cliente)
-                    resultado = procesar(pedido)
-
-                    # Enviar resultado:
-                    enviar(cliente, resultado)
-
-                except ConexionTerminadaExcepcion:
-                    print('Conexión terminada')
-                finally:
-                    print('Cerrando hijo...')
-                    cliente.close()
-                    os._exit(0)
-
-            else: # padre
-                print('Conexión establecida: <{}:{}> con subproceso <{}>'.format(direccion[0], direccion[1], pid))
+                hijo(cliente)
+                os._exit(0)
+            else:
+                print('Conexión establecida: ' +
+                      '<{}:{}> con subproceso <{}>'.format(direccion[0],
+                                                           direccion[1],
+                                                           pid))
                 cliente.close()
-
 
     except KeyboardInterrupt:
         print('Programa terminado')
@@ -176,16 +166,29 @@ def server(host, port):
         servidor.close()
 
 
-def trabajador():
-    pass
+def hijo(cliente):
+    try:
+        # Recibir pedido:
+        pedido = recibir(cliente)
+        resultado = procesar(pedido)
+
+        # Enviar resultado:
+        enviar(cliente, resultado)
+
+    except ConexionTerminadaExcepcion:
+        print('Conexión terminada')
+    finally:
+        print('Cerrando hijo...')
+        cliente.close()
+
 
 def main():
     try:
         # Parámetros de la línea de comandos:
-        opts, _ = getopt(argv[1:], 'i:p:')
+        opts, _ = getopt.getopt(sys.argv[1:], 'i:p:')
 
         # Valores por defecto para host y puerto:
-        #~ host = 'localhost'
+        # host = 'localhost'
         host = '192.168.1.42'
         port = 8000
 
@@ -197,8 +200,8 @@ def main():
 
         server(host, port)
 
-    except GetoptError:
-        print('Error con los parámetros: ' + str(argv))
+    except getopt.GetoptError:
+        print('Error con los parámetros: ' + str(sys.argv))
 
 
 if __name__ == '__main__':
