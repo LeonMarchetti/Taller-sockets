@@ -16,12 +16,16 @@ PROXY = ('89.236.17.108', 3128)
 
 
 def enviar(s, datos):
+    '''Envía datos a través de un socket.
+    '''
     while datos:
         enviado = s.send(datos)
         datos = datos[enviado:]
 
 
-def recibir(s):
+def recibir_HTTP(s):
+    '''Recibe un mensaje HTTP a través de un socket.
+    '''
     content_length = 0
     datos = b''
     while True:
@@ -52,7 +56,11 @@ def recibir(s):
 
 
 def parsear_url(url):
-    # Formateo la url ingresada:
+    '''Formatea un string url, para obtener el host absoluto, host y el
+    recurso a acceder. El host absoluto es el string que incluye el esquema y
+    el host a acceder, por ejemplo "http://www.ejemplo.com" que se antepone en
+    el uri de un pedido HTTP con proxy de por medio.
+    '''
     if not re.match(r'^https?:\/\/', url):
         url = 'http://' + url
 
@@ -70,6 +78,9 @@ def parsear_url(url):
 
 
 def GET(absolute_host, host, recurso, proxy=False):
+    '''Realiza el pedido GET de un recurso. Regresa  el mensaje recibido y el
+    código de estado. Puede realizar el pedido a través de un servidor proxy.
+    '''
     # Elijo la dirección y puerto a la que me voy a conectar según si uso un
     # proxy o no:
     if proxy:
@@ -94,7 +105,7 @@ def GET(absolute_host, host, recurso, proxy=False):
         enviar(servidor, pedido.encode())
 
         # Recibo la respuesta:
-        respuesta = recibir(servidor)
+        respuesta = recibir_HTTP(servidor)
 
         # Obtengo el código de estado:
         linea_estado = respuesta[:respuesta.find(b'\r\n')].decode('ISO-8859-1')
@@ -105,17 +116,18 @@ def GET(absolute_host, host, recurso, proxy=False):
 
 
 def parsear_http(mensaje):
-    # Separar encabezado de html:
+    '''Separa el encabezado y el cuerpo de un mensaje HTTP.
+    '''
     s = mensaje.find(b'\r\n\r\n')
     if s == -1:
         raise Exception('Error: No se encontro separador de HTTP')
 
-    # return header, body
     return mensaje[:s], mensaje[s + 4:]
 
 
 def loggear_header(header, titulo):
-    # Guardo header en un archivo de log:
+    '''Guarda el encabezado en un archivo de log.
+    '''
     str_header = header.decode('ISO-8859-1').replace('\r\n', '\n') + '\r\n'
     log = '[{0}]\n{1}'.format(titulo, str_header)
     with open('paginas/log.txt', 'a') as archivo:
@@ -123,14 +135,18 @@ def loggear_header(header, titulo):
 
 
 def guardar(carpeta, nombre_archivo, datos):
+    '''Guarda los datos en el archivo.
+    '''
     os.makedirs(os.path.dirname(carpeta + '/' + nombre_archivo), exist_ok=True)
     with open(carpeta + '/' + nombre_archivo, 'wb') as archivo:
         archivo.write(datos)
 
 
 def crear_carpeta(nombre_carpeta):
-    # Si ya se había guardado la página antes, se crea una carpeta con un
-    # nombre seguido de un número:
+    '''Crea la carpera pasada por parámetro. Si la carpeta ya existe, se crea
+    una carpeta cuyo nombre es igual al parámetro seguido de un número
+    secuencial.
+    '''
     i = 2
     nombre_base = nombre_carpeta
     while os.path.isdir(nombre_carpeta):
@@ -141,6 +157,9 @@ def crear_carpeta(nombre_carpeta):
 
 
 def buscar_redireccion(header):
+    '''Encuentra el próximo destino de una comunicación HTTP analizando el
+    encabezado de un mensaje HTTP con código 302.
+    '''
     match_location = re.search(r'Location: (.*)\r\n', header)
     if match_location:
         return match_location[1]
@@ -163,6 +182,7 @@ def main():
     else:
         quit()
 
+    # Realizo el pedido hasta que no me siga redirigiendo:
     while True:
         absolute_host, host, pagina = parsear_url(url)
 
@@ -186,9 +206,7 @@ def main():
 
     # Separo header del cuerpo:
     http_header, http_body = parsear_http(http_resp)
-
     loggear_header(http_header, url)
-
     html = http_body.decode('ISO-8859-1')
 
     # Busco el título de la pagina:
@@ -211,18 +229,17 @@ def main():
     pattern = re.compile(r'(?:href|src)=\"([\w/-]*\.(\w*))\"')
     for (nombre_archivo, ext) in re.findall(pattern, html):
         if ext not in ('html'):
-            # Hago un GET de todos los recursos, salvo los html y php:
+            # Hago un GET de todos los recursos, salvo los html:
             try:
                 resp, _ = GET(absolute_host, host, '/' + nombre_archivo, proxy)
+            header, body = parsear_http(resp)
+            guardar(carpeta, nombre_archivo, body)
             except ConnectionRefusedError:
                 print('Conexión rechazada...')
                 break
             except TimeoutError:
                 print('Tiempo agotado para esta solicitud...')
                 continue
-
-            header, body = parsear_http(resp)
-            guardar(carpeta, nombre_archivo, body)
 
 
 if __name__ == '__main__':

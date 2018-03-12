@@ -90,25 +90,23 @@ def parsear_url(url):
 
 
 def HEAD(host, recurso):
-    '''Realiza una solicitud "HEAD". Regresa el mensaje completo y el código de
+    '''Realiza una solicitud "HEAD". Regresa el mensaje recibido y el código de
     estado.'''
-    direccion = (host, 80)
-    # request_uri = recurso
-
+    
+    # Armo pedido HEAD:
     head_linea = 'HEAD {} HTTP/1.1\r\n'.format(recurso)
     print(head_linea.replace('\r\n', ''))
     conn_linea = 'Connection: close\r\n'
     host_linea = 'Host: {}\r\n'.format(host)
-
     pedido = head_linea + conn_linea + host_linea + '\r\n'
 
+    # Comunicación con el servidor.
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as servidor:
-        servidor.connect(direccion)
+        servidor.connect((host, 80))
 
         enviar(servidor, pedido.encode())
 
         # Recibo la respuesta:
-        # respuesta = recibir_encabezado(servidor)
         cachos = []
         while True:
             cacho = s.recv(BUFFER)
@@ -132,11 +130,9 @@ def HEAD(host, recurso):
         return respuesta, codigo
 
 
-def parsear_HEAD(encabezado, codigo):
+def parsear_HEAD(encabezado):
     '''Analiza el encabezado para determinar si archivo se puede descargar
     de a partes, y la longitud del archivo.'''
-    
-    print(encabezado[:encabezado.find('\r\n')])
     
     acepta_rango = False
     longitud = 0
@@ -156,7 +152,7 @@ def descargar(url, cantidad_forks):
     host, recurso = parsear_url(url)
     head_resp, head_cod = HEAD(host, recurso)
     if head_cod in range(200, 300):
-        acepta_rango, longitud = parsear_HEAD(head_resp.decode('ISO-8859-1'), head_cod)
+        acepta_rango, longitud = parsear_HEAD(head_resp.decode('ISO-8859-1'))
         if acepta_rango:
             rangos = []
             longitud_cacho = longitud // cantidad_forks
@@ -230,17 +226,17 @@ def main():
         # Parámetros de la línea de comandos:
         opts, _ = getopt.getopt(sys.argv[1:], 'f:u:')
 
-        # Obtengo el url pasado por parámetro:
+        # Obtengo el url y la cantidad de forks por parámetro:
         url = '' # url
-        f = 2    # Cantidad de forks
+        forks = 0    # Cantidad de forks
         for opt, arg in opts:
             if opt == '-f':
-                cantidad_forks = int(arg)
-            if opt == '-u': # direccion
+                forks = int(arg)
+            if opt == '-u':
                 url = arg
 
-        if url:
-            descargar(url, cantidad_forks)
+        if url and forks:
+            descargar(url, forks)
 
     except getopt.GetoptError:
         print('Error con los parámetros: ' + str(sys.argv))

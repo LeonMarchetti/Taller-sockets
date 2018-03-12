@@ -25,7 +25,8 @@ def guarderia(signum, frame):
     parent process can set up a signal handler to be asynchronously notified of
     that SIGCHLD event and then it can wait for the child to collect its
     termination status, thus preventing the zombie process from being left
-    around.'''
+    around.
+    '''
     while True:
         try:
             pid, estado = os.waitpid(-1, os.WNOHANG)
