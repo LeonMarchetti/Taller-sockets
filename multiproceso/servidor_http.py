@@ -49,7 +49,6 @@ def guarderia(signum, frame):
             return
 
 
-<<<<<<< HEAD
 def ejecutar_php(script):
     '''Ejecuta un script php, y regresa la salida estándar.
     '''
