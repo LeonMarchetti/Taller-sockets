@@ -1,11 +1,4 @@
-﻿# coding=utf-8
-'''
-Parámetros:
-* -i Dirección IP.
-* -p Puerto
-'''
-
-
+# coding=utf-8
 import errno
 import getopt
 import mimetypes
@@ -24,7 +17,6 @@ class ConexionTerminadaExcepcion(Exception):
 
 
 BUFFER = 1024
-# BAD_REQUEST = b'HTTP/1.1 400 Solicitud Incorrecta\r\n\r\n'
 
 lineas_status = {
     200: 'HTTP/1.0 200 OK\r\n',
@@ -47,83 +39,6 @@ def guarderia(signum, frame):
 
         if pid == 0:
             return
-
-
-def ejecutar_php(script):
-    '''Ejecuta un script php, y regresa la salida estándar.
-    '''
-    p = subprocess.Popen('php ' + script, shell=True, stdout=subprocess.PIPE)
-    return p.stdout.read()
-
-
-def buscar_recurso(recurso):
-    '''Busca un recurso en el disco y regresa el mensaje a mandar a través de
-       una conexión HTTP.
-    '''
-    # Busco el archivo:
-    archivo = 'paginas/' + recurso
-
-    tipo_mime = mimetypes.guess_type(recurso)[0]
-    if tipo_mime is None:
-        tipo_mime = 'text/html'
-
-    if os.path.isfile(archivo):
-        status = 'HTTP/1.0 200 OK\r\n'
-    else:
-        status = 'HTTP/1.0 404 No encontrado\r\n'
-        archivo = ('paginas/no_encontrado' +
-                   mimetypes.guess_extension(tipo_mime))
-
-    print('Enviando "{}"'.format(status.strip()))
-
-    # Cabeceras de HTTP:
-    fecha = 'Date: {}\r\n'.format(time.strftime('%a, %d %b %Y %H:%M:%S %Z',
-                                                time.localtime()))
-    tipo_contenido = 'Content-Type: {};charset=utf-8\r\n'.format(tipo_mime)
-
-    # Abro el archivo del recurso. Si es un archivo .php entonces lo ejecuto:
-    if os.path.splitext(archivo)[1] == '.php':
-        body = ejecutar_php(archivo)
-    else:
-        body = b''
-        with open(archivo, 'rb') as f:
-            for linea in f:
-                body += linea
-
-    # Armo la respuesta:
-    return (status.encode() +
-            fecha.encode() +
-            tipo_contenido.encode() +
-            b'\r\n' +
-            body)
-
-
-def procesar(mensaje):
-    '''
-    '''
-    # Parseo la primera línea del pedido, para obtener tipo de pedido y recurso
-    linea_pedido = mensaje[:mensaje.find('\r\n')]
-
-    print('Recibido: "{}"'.format(linea_pedido))
-
-    pedido = re.match(r'^(GET|POST) \/(.*) HTTP\/(?:1\.0|1\.1|2\.0)$',
-                      linea_pedido)
-
-    if pedido:
-        if pedido.group(1) == 'GET':
-            uri = pedido.group(2)
-            qs = uri.find('?')
-            if qs == -1:
-                return buscar_recurso(uri)
-            else:
-                return buscar_recurso(uri[:qs])
-        elif pedido.group(1) == 'POST':
-            linea_vacia = mensaje.find('\r\n\r\n')
-            return buscar_recurso(pedido.group(2), mensaje[linea_vacia+4:])
-        else:
-            return BAD_REQUEST
-    else:
-        return BAD_REQUEST
 
 
 def enviar(s, datos):
