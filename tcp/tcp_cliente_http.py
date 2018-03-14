@@ -233,7 +233,8 @@ def main():
             try:
                 resp, _ = GET(absolute_host, host, '/' + nombre_archivo, proxy)
             header, body = parsear_http(resp)
-            guardar(carpeta, nombre_archivo, body)
+            if body:
+                guardar(carpeta, nombre_archivo, body)
             except ConnectionRefusedError:
                 print('Conexión rechazada...')
                 break

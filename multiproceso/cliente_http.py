@@ -1,4 +1,4 @@
-﻿#coding=utf-8
+﻿# coding=utf-8
 import getopt
 import os
 import os.path
@@ -92,7 +92,8 @@ def GET(host, recurso):
         # Obtengo el código de estado:
         linea_estado = respuesta[:respuesta.find(b'\r\n')].decode('ISO-8859-1')
         print(linea_estado)
-        codigo = int(re.match(r'^HTTP/\d\.\d (\d{3}) [\w ]+$', linea_estado)[1])
+        codigo = int(re.match(r'^HTTP/\d\.\d (\d{3}) [\w ]+$',
+                              linea_estado)[1])
 
         return respuesta, codigo
 
@@ -166,7 +167,20 @@ def guardar(carpeta, nombre_archivo, datos):
         archivo.write(datos)
 
 
+def buscar_titulo(html):
+    '''Busca el título de una página HTML.
+    '''
+    title_search = re.search(r'<title>\s*(.*)\s*</title>', html)
+    if title_search:
+        return title_search[1].strip()
+    else:
+        return ''
+
+
 def recuperar(url, dir):
+    '''Recupera la página web indica por la url y la almacena en el directorio
+       indicado.
+    '''
     # Primero pido la página principal
     # Realizo el pedido hasta que no me siga redirigiendo:
     while True:
@@ -200,9 +214,16 @@ def recuperar(url, dir):
 
         # Guardo el archivo:
         if pagina in ('', '/'):
-            guardar(dir, url, http_body)
+            # Busco el título de la pagina:
+            titulo = buscar_titulo(html)
+            if titulo:
+                archivo = titulo.replace(' ', '_') + '.html'
+            else:
+                archivo = url.replace('.', '_dot_') + '.html'
         else:
-            guardar(dir, pagina, http_body)
+            archivo = pagina
+            
+        guardar(dir, archivo, http_body)
 
         signal.signal(signal.SIGCHLD, guarderia)
 
@@ -210,13 +231,15 @@ def recuperar(url, dir):
         pattern = re.compile(r'(?:href|src)=\"([\w/-]*\.(\w*))\"')
         for (nombre_archivo, ext) in re.findall(pattern, html):
             if ext not in ('html'):
+                # Hago un GET de todos los recursos, salvo los html:
                 pid = os.fork()
                 if pid == 0:
-                    # Hago un GET de todos los recursos, salvo los html:
+                    # Proceso hijo:
                     try:
-                        resp, _ = GET(absolute_host, host, '/' + nombre_archivo, proxy)
+                        resp, _ = GET(host, '/' + nombre_archivo)
                         header, body = parsear_http(resp)
-                        guardar(carpeta, nombre_archivo, body)
+                        if body:
+                            guardar(carpeta, nombre_archivo, body)
                     except ConnectionRefusedError:
                         print('Conexión rechazada...')
                     except TimeoutError:
@@ -225,6 +248,7 @@ def recuperar(url, dir):
                         os._exit(0)
 
                 else:
+                    # Proceso padre:
                     print('Forkeado a proceso: {}'.format(pid))
 
 
