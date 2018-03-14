@@ -1,9 +1,16 @@
 ﻿# coding=utf-8
+'''
+Parámetros:
+* -d Directorio donde guardar la página y sus recursos asociados.
+* -u URL de la página a solicitar
+'''
+
 import getopt
 import os
 import os.path
 import re
 import urllib.parse
+import signal
 import socket
 import sys
 
@@ -26,6 +33,21 @@ def guarderia(signum, frame):
 
         if pid == 0:
             return
+
+
+def parsear_url(url):
+    '''Formatea un string url, para obtener el host y el recurso a acceder.
+    '''
+    if not re.match(r'^https?:\/\/', url):
+        url = 'http://' + url
+
+    oURL = urllib.parse.urlparse(url)
+
+    pagina = oURL.path
+    if pagina == '':
+        pagina = '/'
+
+    return oURL.netloc, pagina
 
 
 def enviar(s, datos):
@@ -64,7 +86,7 @@ def recibir_HTTP(s):
                 for header in lista_headers:
                     cl_match = re.match(r'^Content-Length: (\d+)$', header)
                     if cl_match:
-                        content_length = int(cl_match[1])
+                        content_length = int(cl_match.group(1))
                         break
 
 
@@ -74,7 +96,7 @@ def GET(host, recurso):
     '''
     # Armo el pedido:
     get_linea = 'GET {} HTTP/1.1\r\n'.format(recurso)
-    print(get_linea.replace('\r\n', ''))
+    print(get_linea.strip())
     conn_linea = 'Connection: close\r\n'
     host_linea = 'Host: {}\r\n'.format(host)
 
@@ -93,35 +115,9 @@ def GET(host, recurso):
         linea_estado = respuesta[:respuesta.find(b'\r\n')].decode('ISO-8859-1')
         print(linea_estado)
         codigo = int(re.match(r'^HTTP/\d\.\d (\d{3}) [\w ]+$',
-                              linea_estado)[1])
+                              linea_estado).group(1))
 
         return respuesta, codigo
-
-
-def parsear_url(url):
-    '''Formatea un string url, para obtener el host y el recurso a acceder.
-    '''
-    if not re.match(r'^https?:\/\/', url):
-        url = 'http://' + url
-
-    oURL = urllib.parse.urlparse(url)
-
-    pagina = oURL.path
-    if pagina == '':
-        pagina = '/'
-
-    return oURL.netloc, pagina
-
-
-def buscar_redireccion(header):
-    '''Encuentra el próximo destino de una comunicación HTTP analizando el
-    encabezado de un mensaje HTTP con código 302.
-    '''
-    match_location = re.search(r'Location: (.*)\r\n', header)
-    if match_location:
-        return match_location[1]
-    else:
-        raise Exception('Destino de redirección no encontrado...')
 
 
 def parsear_http(mensaje):
@@ -134,12 +130,23 @@ def parsear_http(mensaje):
     return mensaje[:s], mensaje[s + 4:]
 
 
+def buscar_redireccion(header):
+    '''Encuentra el próximo destino de una comunicación HTTP analizando el
+    encabezado de un mensaje HTTP con código 302.
+    '''
+    match_location = re.search(r'Location: (.*)\r\n', header)
+    if match_location:
+        return match_location.group(1)
+    else:
+        raise Exception('Destino de redirección no encontrado...')
+
+
 def loggear_header(encabezado, titulo):
     '''Guarda el encabezado en un archivo de log.
     '''
     str_header = encabezado.decode('ISO-8859-1').replace('\r\n', '\n') + '\r\n'
     log = '[{0}]\n{1}'.format(titulo, str_header)
-    with open('paginas/log.txt', 'a') as archivo:
+    with open('log.txt', 'a') as archivo:
         archivo.write(log)
 
 
@@ -156,15 +163,24 @@ def crear_carpeta(nombre_carpeta):
 
     os.makedirs(nombre_carpeta)
 
+    return nombre_carpeta
+
 
 def guardar(carpeta, nombre_archivo, datos):
     '''Guarda los datos en el archivo.
     '''
     # Extraigo la barra de directorio del nombre del archivo, si lo tuviera:
-    match = re.match(r'\/?(.*)', nombre_archivo)
-    path_archivo = os.path.join(carpeta, match.group(1))
-    with open(path_archivo, 'wb') as archivo:
-        archivo.write(datos)
+    try:
+        match = re.match(r'\/?(.*)', nombre_archivo)
+        path_archivo = os.path.join(carpeta, match.group(1))
+
+        os.makedirs(os.path.dirname(path_archivo), exist_ok=True)
+
+        with open(path_archivo, 'wb') as archivo:
+            archivo.write(datos)
+    except Exception as e:
+        print('{}'.format(e))
+        raise
 
 
 def buscar_titulo(html):
@@ -172,7 +188,7 @@ def buscar_titulo(html):
     '''
     title_search = re.search(r'<title>\s*(.*)\s*</title>', html)
     if title_search:
-        return title_search[1].strip()
+        return title_search.group(1).strip()
     else:
         return ''
 
@@ -189,7 +205,7 @@ def recuperar(url, dir):
         # Armo y envío el pedido al servidor, y obtengo la respuesta:
         try:
             http_resp, estado = GET(host, pagina)
-            if estado in (302):
+            if estado in (302,):
                 # Si obtengo un mensaje de redirección, obtengo el nuevo
                 # destino y busco de vuelta
                 http_header, _ = parsear_http(http_resp)
@@ -197,6 +213,7 @@ def recuperar(url, dir):
                 continue
             else:
                 break
+
         except ConnectionRefusedError:
             print('Conexión rechazada...')
             quit()
@@ -204,55 +221,58 @@ def recuperar(url, dir):
             print('Tiempo agotado para esta solicitud...')
             quit()
 
-        # Separo header del cuerpo:
-        http_header, http_body = parsear_http(http_resp)
-        loggear_header(http_header, url)
-        html = http_body.decode('ISO-8859-1')
+    # Separo header del cuerpo:
+    http_header, http_body = parsear_http(http_resp)
+    loggear_header(http_header, url)
+    html = http_body.decode('ISO-8859-1')
 
-        # Creo la carpeta donde guardar la página:
-        crear_carpeta(dir)
+    # Creo la carpeta donde guardar la página:
+    dir = crear_carpeta(dir)
 
-        # Guardo el archivo:
-        if pagina in ('', '/'):
-            # Busco el título de la pagina:
-            titulo = buscar_titulo(html)
-            if titulo:
-                archivo = titulo.replace(' ', '_') + '.html'
-            else:
-                archivo = url.replace('.', '_dot_') + '.html'
+    # Guardo el archivo:
+    if pagina in ('', '/'):
+        # Busco el título de la página:
+        titulo = buscar_titulo(html)
+        if titulo:
+            archivo = titulo.replace(' ', '_') + '.html'
         else:
-            archivo = pagina
-            
-        guardar(dir, archivo, http_body)
+            archivo = url.replace('.', '_dot_') + '.html'
+    else:
+        archivo = pagina
 
-        signal.signal(signal.SIGCHLD, guarderia)
+    guardar(dir, archivo, http_body)
 
-        # Busco las referencias externas en el html:
-        pattern = re.compile(r'(?:href|src)=\"([\w/-]*\.(\w*))\"')
-        for (nombre_archivo, ext) in re.findall(pattern, html):
-            if ext not in ('html'):
-                # Hago un GET de todos los recursos, salvo los html:
-                pid = os.fork()
-                if pid == 0:
-                    # Proceso hijo:
-                    try:
-                        resp, _ = GET(host, '/' + nombre_archivo)
-                        header, body = parsear_http(resp)
-                        if body:
-                            guardar(carpeta, nombre_archivo, body)
-                    except ConnectionRefusedError:
-                        print('Conexión rechazada...')
-                    except TimeoutError:
-                        print('Tiempo agotado para esta solicitud...')
-                    finally:
-                        os._exit(0)
+    signal.signal(signal.SIGCHLD, guarderia)
 
-                else:
-                    # Proceso padre:
-                    print('Forkeado a proceso: {}'.format(pid))
+    # Busco las referencias externas en el html:
+    pattern = re.compile(r'(?:href|src)=\"([\w/-]*\.(\w*))\"')
+    for (nombre_archivo, ext) in re.findall(pattern, html):
+        if ext not in ('html',):
+            # Hago un GET de todos los recursos, salvo los html:
+            pid = os.fork()
+            if pid == 0:
+                # Proceso hijo:
+                try:
+                    resp, _ = GET(host, '/' + nombre_archivo)
+                    header, body = parsear_http(resp)
+                    if body:
+                        guardar(dir, nombre_archivo, body)
+
+                except ConnectionRefusedError:
+                    print('Conexión rechazada...')
+                except TimeoutError:
+                    print('Tiempo agotado para esta solicitud...')
+                finally:
+                    os._exit(0)
+
+            else:
+                # Proceso padre:
+                print('Forkeado a proceso: {}'.format(pid))
 
 
 def main(argv):
+    '''Función principal.
+    '''
     try:
         # Parámetros de la línea de comandos:
         opts, _ = getopt.getopt(argv[1:], 'd:u:')
@@ -264,7 +284,7 @@ def main(argv):
             if opt == '-d':  # Directorio/Carpeta
                 dir = arg
             elif opt == '-u':  # URL
-                url = int(arg)
+                url = arg
 
         if url:
             if dir:

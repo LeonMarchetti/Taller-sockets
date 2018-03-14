@@ -1,0 +1,291 @@
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 15:50:17 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 15:53:49 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 15:56:14 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 15:58:22 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 15:59:33 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:01:27 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:04:53 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:06:14 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:07:09 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:08:05 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:08:51 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:10:41 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:11:19 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:16:23 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:18:03 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:19:05 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:21:45 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:22:17 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:23:28 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:39:11 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:41:59 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:42:54 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:43:38 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:48:59 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:49:40 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:54:08 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:54:33 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 16:59:55 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 17:00:11 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.scintilla.org/SciTEDoc.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 17:06:11 GMT
+Server: Apache/2.0.52 (Red Hat)
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Cache-Control: max-age=0
+Expires: Wed, 14 Mar 2018 17:06:11 GMT
+Content-Length: 215572
+Connection: close
+Content-Type: text/html
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 17:11:56 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 17:17:07 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 17:20:00 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 17:20:44 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 17:22:05 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Wed, 14 Mar 2018 17:29:38 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1

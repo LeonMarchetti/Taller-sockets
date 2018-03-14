@@ -1,4 +1,11 @@
 ﻿# coding=utf-8
+'''
+Parámetros:
+* -i Dirección IP.
+* -p Puerto
+'''
+
+
 import errno
 import getopt
 import mimetypes
@@ -38,11 +45,16 @@ def guarderia(signum, frame):
 
 
 def ejecutar_php(script):
+    '''Ejecuta un script php, y regresa la salida estándar.
+    '''
     p = subprocess.Popen('php ' + script, shell=True, stdout=subprocess.PIPE)
     return p.stdout.read()
 
 
-def buscar_recurso(recurso, datos):
+def buscar_recurso(recurso):
+    '''Busca un recurso en el disco y regresa el mensaje a mandar a través de
+       una conexión HTTP.
+    '''
     # Busco el archivo:
     archivo = 'paginas/' + recurso
 
@@ -57,7 +69,7 @@ def buscar_recurso(recurso, datos):
         archivo = ('paginas/no_encontrado' +
                    mimetypes.guess_extension(tipo_mime))
 
-    print('Enviando "{}"'.format(status))
+    print('Enviando "{}"'.format(status.strip()))
 
     # Cabeceras de HTTP:
     fecha = 'Date: {}\r\n'.format(time.strftime('%a, %d %b %Y %H:%M:%S %Z',
@@ -82,6 +94,8 @@ def buscar_recurso(recurso, datos):
 
 
 def procesar(mensaje):
+    '''
+    '''
     # Parseo la primera línea del pedido, para obtener tipo de pedido y recurso
     linea_pedido = mensaje[:mensaje.find('\r\n')]
 
@@ -95,9 +109,9 @@ def procesar(mensaje):
             uri = pedido.group(2)
             qs = uri.find('?')
             if qs == -1:
-                return buscar_recurso(uri, '')
+                return buscar_recurso(uri)
             else:
-                return buscar_recurso(uri[:qs], uri[qs+1:])
+                return buscar_recurso(uri[:qs])
         elif pedido.group(1) == 'POST':
             linea_vacia = mensaje.find('\r\n\r\n')
             return buscar_recurso(pedido.group(2), mensaje[linea_vacia+4:])
