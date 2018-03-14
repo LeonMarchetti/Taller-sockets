@@ -126,8 +126,6 @@ def procesar(mensaje):
         return BAD_REQUEST
 
 
-=======
->>>>>>> multi_servidor_0001
 def enviar(s, datos):
     '''Envía datos a través de un socket.
     '''
