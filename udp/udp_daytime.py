@@ -1,9 +1,13 @@
-import datetime
-import getopt
-import socket
-import sys
+# coding=utf-8
+"""
+Parámetros:
+* -c    Modo cliente
+* -s    Modo servidor
+* -i    Dirección IP o nombre de host
+* -p    Número de puerto
+* -h    Huso horario como diferencia de tiempo del UTC
 
-""" PDU:
+PDU:
 Pedido:
  0
  0             7
@@ -21,107 +25,121 @@ Daytime string: 28 bytes
   Fecha y tiempo actual con el huso horario especificado.
 """
 
-# Parámetros por defecto para host y puerto:
-HOST       = 'localhost'
-PORT       = 65000
-TAM_MSG    = 28
-TAM_BUFFER = 1024
 
+import datetime
+import getopt
+import socket
+import sys
+
+
+TAM_MSG = 28
 MESES = ('ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN',
          'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DEC')
+FORMATO_TIEMPO = '%d %b %y %H:%M:%S %z'
 
-FORMATO_RESPUESTA = '{0:0>2} {1:>3} {2:0>2} {3:0>2}:{4:0>2}:{5:0>2} {6}'
 
-def armar_respuesta(ahora, huso):
-    # ahora => datetime.datetime.now(tzs) : datetime.datetime
-    # huso => tz.tzname(ahora) : str
-    return FORMATO_RESPUESTA.format(
-        ahora.day,
-        MESES[ahora.month-1],
-        ahora.year % 100,
-        ahora.hour,
-        ahora.minute,
-        ahora.second,
-        huso
-    )
-
-def server():
-    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-        s.bind((HOST, PORT))
-        print('Escuchando en: <{}:{}>'.format(HOST, PORT))
+def server(host, port):
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as servidor:
+        servidor.bind((host, port))
+        print('Escuchando en: <{}:{}>'.format(host, port))
         while True:
-            datos, cliente = s.recvfrom(TAM_BUFFER)
+            datos, cliente = servidor.recvfrom(1)
             if datos:
                 # Proceso del pedido:
-                huso = int.from_bytes(datos, 'big') - 24
-                td = datetime.timedelta(hours=huso)
-                tz = datetime.timezone(td)
-                ahora = datetime.datetime.now(tz)
-                mensaje = armar_respuesta(ahora, tz.tzname(ahora))
+                huso = int.from_bytes(datos, 'big', signed=True)
+                print('Recibido de <{}:{}> > huso={}'.format(cliente[0], cliente[1], huso))
 
-                # Responder:
+                # Armo la respuesta:
+                mensaje = armar_respuesta(huso)
+
+                # Respondo:
                 print('Enviado > ' + mensaje)
-                s.sendto(mensaje.encode(), cliente)
+                servidor.sendto(mensaje.encode(), cliente)
 
-def client(huso):
-    if huso == '':
-        huso = int(input('Ingrese huso horario (entre -23 y 23)> '))
 
-    if huso <= -24 or huso >= 24:
-        print('El huso horario tiene que estar entre -23 y 23.')
-        return
+def armar_respuesta(huso):
+    td = datetime.timedelta(hours=huso)
+    tz = datetime.timezone(td)
+    ahora = datetime.datetime.now(tz)
+    return ahora.strftime(FORMATO_TIEMPO)
 
-    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-        # Pedido
-        h = huso + 24 # No se pueden transmitir enteros negativos
-        s.sendto(h.to_bytes(1, 'big'), (HOST, PORT))
+
+def client(host, port, huso):
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as cliente:
+        # Pedido:
+        datos_salida = huso.to_bytes(1, 'big', signed=True)
+        cliente.sendto(datos_salida, (host, port))
 
         # Respuesta:
-        datos, _ = s.recvfrom(TAM_BUFFER)
-        resp = datos.decode()
-        if len(resp) == TAM_MSG:
-            print(datos.decode())
+        datos_entrada, _ = cliente.recvfrom(TAM_MSG)
+        respuesta = datos_entrada.decode()
+
+        # Muestro resultado:
+        if validar(respuesta):
+            print(respuesta)
         else:
-            print('Error con el mensaje')
+            print('Error con el mensaje: <{}>'.format(respuesta))
 
-if __name__ == '__main__':
 
-    # Parametros de la linea de comandos:
+def validar(mensaje):
     try:
-        opts, _ = getopt.getopt(sys.argv[1:], 'csi:p:h:')
+        datetime.datetime.strptime(mensaje, FORMATO_TIEMPO)
+    except ValueError:
+        return False
+
+    return True
+
+
+def main(argv):
+    try:
+        opts, _ = getopt.getopt(argv[1:], 'csi:p:h:')
     except getopt.GetoptError:
-        print('Error con los parametros: ' + str(sys.argv))
+        print('Error con los parámetros: {}'.format(str(argv)))
         sys.exit(1)
 
-    modo = '' # modo Cliente o Servidor
+    # Valores por defecto para host y puerto:
+    host = 'localhost'
+    port = 1313
+
+    modo = ''  # modo Cliente o Servidor
     huso = None
 
     for opt, arg in opts:
-        if opt == '-c': # Modo Cliente
+        if opt == '-c':  # Modo Cliente
             if modo == '':
                 modo = 'c'
             else:
                 print('Error... no se puede ser cliente y servidor al mismo tiempo!')
                 sys.exit(1)
-        elif opt == '-s': # Modo Servidor
+        elif opt == '-s':  # Modo Servidor
             if modo == '':
                 modo = 's'
             else:
                 print('Error... no se puede ser cliente y servidor al mismo tiempo!')
                 sys.exit(1)
-        elif opt == '-i': # Direccion IP
-            HOST = arg
-        elif opt == '-p': # Puerto
-            PORT = int(arg)
+        elif opt == '-i':  # Direccion IP
+            host = arg
+        elif opt == '-p':  # Puerto
+            port = int(arg)
         elif opt == '-h':
-            huso = int(arg)
+            try:
+                huso = int(arg)
+                if not -23 <= huso <= 23:
+                    raise ValueError
+            except ValueError:
+                print('-h: Huso tiene que ser un número entre -23 y 23')
+                sys.exit(1)
 
     if modo == '':
         print('Usar "-c" para modo Cliente y "-s" para modo Servidor')
     elif modo == 'c':
         if huso is None:
-            print('No se ingreso el huso horario')
+            print('No se ingresó el huso horario')
         else:
-            client(huso)
+            client(host, port, huso)
     elif modo == 's':
-        server()
+        server(host, port)
+
+
+if __name__ == '__main__':
+    main(sys.argv)

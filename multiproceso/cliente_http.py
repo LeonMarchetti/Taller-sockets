@@ -1,9 +1,9 @@
 ﻿# coding=utf-8
-'''
+"""
 Parámetros:
 * -d Directorio donde guardar la página y sus recursos asociados.
 * -u URL de la página a solicitar
-'''
+"""
 
 import getopt
 import os
@@ -19,12 +19,12 @@ BUFFER = 1024
 
 
 def guarderia(signum, frame):
-    '''When a child process exits, the kernel sends a SIGCHLD signal. The
+    """When a child process exits, the kernel sends a SIGCHLD signal. The
     parent process can set up a signal handler to be asynchronously notified of
     that SIGCHLD event and then it can wait for the child to collect its
     termination status, thus preventing the zombie process from being left
     around.
-    '''
+    """
     while True:
         try:
             pid, estado = os.waitpid(-1, os.WNOHANG)
@@ -36,31 +36,31 @@ def guarderia(signum, frame):
 
 
 def parsear_url(url):
-    '''Formatea un string url, para obtener el host y el recurso a acceder.
-    '''
+    """Formatea un string url, para obtener el host y el recurso a acceder.
+    """
     if not re.match(r'^https?:\/\/', url):
         url = 'http://' + url
 
-    oURL = urllib.parse.urlparse(url)
+    o = urllib.parse.urlparse(url)
 
-    pagina = oURL.path
+    pagina = o.path
     if pagina == '':
         pagina = '/'
 
-    return oURL.netloc, pagina
+    return o.netloc, pagina
 
 
 def enviar(s, datos):
-    '''Envía datos a través de un socket.
-    '''
+    """Envía datos a través de un socket.
+    """
     while datos:
         enviado = s.send(datos)
         datos = datos[enviado:]
 
 
-def recibir_HTTP(s):
-    '''Recibe un mensaje HTTP a través de un socket.
-    '''
+def recibir_http(s):
+    """Recibe un mensaje HTTP a través de un socket.
+    """
     content_length = 0
     datos = b''
     while True:
@@ -91,9 +91,9 @@ def recibir_HTTP(s):
 
 
 def GET(host, recurso):
-    '''Realiza el pedido GET de un recurso. Regresa  el mensaje recibido y el
+    """Realiza el pedido GET de un recurso. Regresa  el mensaje recibido y el
     código de estado.
-    '''
+    """
     # Armo el pedido:
     get_linea = 'GET {} HTTP/1.1\r\n'.format(recurso)
     print(get_linea.strip())
@@ -109,7 +109,7 @@ def GET(host, recurso):
         enviar(servidor, pedido.encode())
 
         # Recibo la respuesta:
-        respuesta = recibir_HTTP(servidor)
+        respuesta = recibir_http(servidor)
 
         # Obtengo el código de estado:
         linea_estado = respuesta[:respuesta.find(b'\r\n')].decode('ISO-8859-1')
@@ -121,8 +121,8 @@ def GET(host, recurso):
 
 
 def parsear_http(mensaje):
-    '''Separa el encabezado y el cuerpo de un mensaje HTTP.
-    '''
+    """Separa el encabezado y el cuerpo de un mensaje HTTP.
+    """
     s = mensaje.find(b'\r\n\r\n')
     if s == -1:
         raise Exception('Error: No se encontro separador de HTTP')
@@ -131,9 +131,9 @@ def parsear_http(mensaje):
 
 
 def buscar_redireccion(header):
-    '''Encuentra el próximo destino de una comunicación HTTP analizando el
+    """Encuentra el próximo destino de una comunicación HTTP analizando el
     encabezado de un mensaje HTTP con código 302.
-    '''
+    """
     match_location = re.search(r'Location: (.*)\r\n', header)
     if match_location:
         return match_location.group(1)
@@ -142,8 +142,8 @@ def buscar_redireccion(header):
 
 
 def loggear_header(encabezado, titulo):
-    '''Guarda el encabezado en un archivo de log.
-    '''
+    """Guarda el encabezado en un archivo de log.
+    """
     str_header = encabezado.decode('ISO-8859-1').replace('\r\n', '\n') + '\r\n'
     log = '[{0}]\n{1}'.format(titulo, str_header)
     with open('log.txt', 'a') as archivo:
@@ -151,10 +151,10 @@ def loggear_header(encabezado, titulo):
 
 
 def crear_carpeta(nombre_carpeta):
-    '''Crea la carpera pasada por parámetro. Si la carpeta ya existe, se crea
+    """Crea la carpera pasada por parámetro. Si la carpeta ya existe, se crea
     una carpeta cuyo nombre es igual al parámetro seguido de un número
     secuencial.
-    '''
+    """
     i = 2
     nombre_base = nombre_carpeta
     while os.path.isdir(nombre_carpeta):
@@ -167,8 +167,8 @@ def crear_carpeta(nombre_carpeta):
 
 
 def guardar(carpeta, nombre_archivo, datos):
-    '''Guarda los datos en el archivo.
-    '''
+    """Guarda los datos en el archivo.
+    """
     # Extraigo la barra de directorio del nombre del archivo, si lo tuviera:
     try:
         match = re.match(r'\/?(.*)', nombre_archivo)
@@ -184,8 +184,8 @@ def guardar(carpeta, nombre_archivo, datos):
 
 
 def buscar_titulo(html):
-    '''Busca el título de una página HTML.
-    '''
+    """Busca el título de una página HTML.
+    """
     title_search = re.search(r'<title>\s*(.*)\s*</title>', html)
     if title_search:
         return title_search.group(1).strip()
@@ -193,10 +193,10 @@ def buscar_titulo(html):
         return ''
 
 
-def recuperar(url, dir):
-    '''Recupera la página web indica por la url y la almacena en el directorio
+def recuperar(url, carpeta):
+    """Recupera la página web indica por la url y la almacena en el directorio
        indicado.
-    '''
+    """
     # Primero pido la página principal
     # Realizo el pedido hasta que no me siga redirigiendo:
     while True:
@@ -227,7 +227,8 @@ def recuperar(url, dir):
     html = http_body.decode('ISO-8859-1')
 
     # Creo la carpeta donde guardar la página:
-    dir = crear_carpeta(dir)
+    # Puede cambiar el nombre de la carpeta para no sobreescribir una página ya existente.
+    carpeta = crear_carpeta(carpeta)
 
     # Guardo el archivo:
     if pagina in ('', '/'):
@@ -240,7 +241,7 @@ def recuperar(url, dir):
     else:
         archivo = pagina
 
-    guardar(dir, archivo, http_body)
+    guardar(carpeta, archivo, http_body)
 
     signal.signal(signal.SIGCHLD, guarderia)
 
@@ -256,7 +257,7 @@ def recuperar(url, dir):
                     resp, _ = GET(host, '/' + nombre_archivo)
                     header, body = parsear_http(resp)
                     if body:
-                        guardar(dir, nombre_archivo, body)
+                        guardar(carpeta, nombre_archivo, body)
 
                 except ConnectionRefusedError:
                     print('Conexión rechazada...')
@@ -271,24 +272,24 @@ def recuperar(url, dir):
 
 
 def main(argv):
-    '''Función principal.
-    '''
+    """Función principal.
+    """
     try:
         # Parámetros de la línea de comandos:
         opts, _ = getopt.getopt(argv[1:], 'd:u:')
 
-        dir = ''
+        carpeta = ''
         url = ''
 
         for opt, arg in opts:
             if opt == '-d':  # Directorio/Carpeta
-                dir = arg
+                carpeta = arg
             elif opt == '-u':  # URL
                 url = arg
 
         if url:
-            if dir:
-                recuperar(url, dir)
+            if carpeta:
+                recuperar(url, carpeta)
             else:
                 recuperar(url, 'paginas')
 

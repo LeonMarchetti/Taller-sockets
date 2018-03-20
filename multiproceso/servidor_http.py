@@ -1,4 +1,10 @@
 # coding=utf-8
+"""
+Parámetros:
+* -i Dirección IP o nombre de Host
+* -p Número de puerto
+"""
+
 import errno
 import getopt
 import mimetypes
@@ -24,13 +30,14 @@ lineas_status = {
     404: 'HTTP/1.0 404 No encontrado\r\n',
 }
 
+
 def guarderia(signum, frame):
-    '''When a child process exits, the kernel sends a SIGCHLD signal. The
+    """When a child process exits, the kernel sends a SIGCHLD signal. The
     parent process can set up a signal handler to be asynchronously notified of
     that SIGCHLD event and then it can wait for the child to collect its
     termination status, thus preventing the zombie process from being left
     around.
-    '''
+    """
     while True:
         try:
             pid, estado = os.waitpid(-1, os.WNOHANG)
@@ -42,8 +49,8 @@ def guarderia(signum, frame):
 
 
 def enviar(s, datos):
-    '''Envía datos a través de un socket.
-    '''
+    """Envía datos a través de un socket.
+    """
     while datos:
         enviado = s.send(datos)
         if enviado == 0:
@@ -52,8 +59,8 @@ def enviar(s, datos):
 
 
 def recibir(s):
-    '''Recibe un encabezado de http a través de un socket.
-    '''
+    """Recibe un encabezado de http a través de un socket.
+    """
     cachos = []
     while True:
         cacho = s.recv(BUFFER)
@@ -71,16 +78,16 @@ def recibir(s):
 
 
 def ejecutar_php(script):
-    '''Ejecuta un script de PHP, devolviendo la salida estándar.
-    '''
+    """Ejecuta un script de PHP, devolviendo la salida estándar.
+    """
     p = subprocess.Popen('php ' + script, shell=True, stdout=subprocess.PIPE)
     return p.stdout.read()
 
 
 def buscar_recurso(pedido):
-    '''Analiza el pedido y obtiene el recurso a devolver, el código de estado
+    """Analiza el pedido y obtiene el recurso a devolver, el código de estado
        y el tipo mime del recurso.
-    '''
+    """
     if pedido:
         archivo = 'paginas/' + pedido.group(2)
         estado = 200
@@ -103,10 +110,10 @@ def buscar_recurso(pedido):
 
 
 def procesar(mensaje):
-    '''Analiza el mensaje HTTP recibido, y devuelve el mensaje de respuesta con
+    """Analiza el mensaje HTTP recibido, y devuelve el mensaje de respuesta con
        el recurso pedido. Si no se encuentra en el servidor se devuelve una
        página o recurso de no encontrado.
-    '''
+    """
     linea_pedido = mensaje[:mensaje.find('\r\n')]
     print('Recibido: "{}"'.format(linea_pedido))
 
@@ -145,10 +152,11 @@ def procesar(mensaje):
 
 
 def server(host, port):
-    '''Atiende pedidos de HTTP, forkeando un subproceso por cada pedido.
-    '''
+    """Atiende pedidos de HTTP, forkeando un subproceso por cada pedido.
+    """
+    servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         servidor.bind((host, port))
         servidor.listen(5)
@@ -199,12 +207,12 @@ def server(host, port):
         servidor.close()
 
 
-def main():
-    '''Función principal.
-    '''
+def main(argv):
+    """Función principal.
+    """
     try:
         # Parámetros de la línea de comandos:
-        opts, _ = getopt.getopt(sys.argv[1:], 'i:p:')
+        opts, _ = getopt.getopt(argv[1:], 'i:p:')
 
         # Valores por defecto para host y puerto:
         # host = 'localhost'
@@ -224,4 +232,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
