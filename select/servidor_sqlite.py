@@ -9,7 +9,6 @@ Parámetros:
 """
 import getopt
 import json
-# noinspection PyUnresolvedReferences
 import select_server
 import socket
 import sqlite3
@@ -135,13 +134,15 @@ if __name__ == '__main__':
                 if modo == '':
                     modo = 'c'
                 else:
-                    print('Error... no se puede ser cliente y servidor al mismo tiempo!')
+                    print('Error... no se puede ser cliente y servidor al '
+                          'mismo tiempo!')
                     sys.exit(1)
             elif opt == '-s':  # Modo Servidor
                 if modo == '':
                     modo = 's'
                 else:
-                    print('Error... no se puede ser cliente y servidor al mismo tiempo!')
+                    print('Error... no se puede ser cliente y servidor al '
+                          'mismo tiempo!')
                     sys.exit(1)
             elif opt == '-i':  # Dirección IP
                 host = arg
@@ -158,4 +159,3 @@ if __name__ == '__main__':
             if not query_string:
                 query_string = input('Ingresar query > ')
             cliente((host, port), query_string)
-

@@ -57,7 +57,6 @@ def servidor(direccion, proceso):
 
                     # Remove message queue
                     del message_queues[s]
-                    # Handle outputs
 
         # Handle outputs
         for s in writable:

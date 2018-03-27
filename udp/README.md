@@ -1,6 +1,6 @@
 # udp
 
 ## Ejercicios
-1. Implementación del protocolo **Daytime**
-2. Round Trip Time (**RTT**)
-3. Comunicación con mensajes comprimidos con **zlib**
+- [x] Implementación del protocolo **Daytime**
+- [x] Round Trip Time (**RTT**) 
+- [x] Comunicación con mensajes comprimidos con **zlib**
