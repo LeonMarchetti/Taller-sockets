@@ -11,7 +11,6 @@ import socket
 import sys
 
 
-# Mensaje de tamano fijo:
 TOKEN = b';;'
 
 
