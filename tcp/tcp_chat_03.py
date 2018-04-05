@@ -52,48 +52,47 @@ def enviar(s, mensaje, _id):
 
 
 def recibir(s):
+    paquetes = []
     cachos = b''
-    i = 0
     while True:
         cacho = s.recv(1024)
         if cacho:
             cachos += cacho
+            longitud = int.from_bytes(cachos[:1], 'big') + 9
+            while len(cachos) >= longitud:
+                # Si recibo más de un paquete almaceno el primero, lo saco de
+                # los cachos y sigo recibiendo el próximo.
+                paquetes.append(cachos[:longitud])
+                cachos = cachos[longitud:]
+                if not cachos:
+                    return paquetes
 
-            # longitud: 1 (long) + 4 (id) + 4(td) + len(mensaje)
-            longitud = int.from_bytes(cachos[i:i+1], 'big') + 9
-            if len(cachos) == longitud:
-                break
-            elif len(cachos) > longitud:
-                # Si llega una parte de otro mensaje, corro el byte de donde
-                # leo la longitud para leer la longitud del siguiente mensaje:
-                i = longitud
+                longitud = int.from_bytes(cachos[:1], 'big') + 9
 
         else:
             raise ConexionTerminadaExcepcion
 
-    return cachos
 
+def procesar(paquetes):
+    # Parseo del/os paquetes:
+    for paquete in paquetes:
+        longitud = int.from_bytes(paquete[:1], 'big')
+        _id = int.from_bytes(paquete[1:5], 'big')
+        timestamp = int.from_bytes(paquete[5:9], 'big')
+        mensaje = paquete[9:].decode()
 
-def procesar(paquete):
-    # Parseo del paquete:
-    longitud = int.from_bytes(paquete[:1], 'big')
-    _id = int.from_bytes(paquete[1:5], 'big')
-    timestamp = int.from_bytes(paquete[5:9], 'big')
-    mensaje = paquete[9:].decode()
+        # Conversión de la hora:
+        tiempo = time.strftime('%H:%M:%S %z', time.localtime(timestamp))
 
-    # Conversión de la hora:
-    tiempo = time.strftime('%H:%M:%S %z', time.localtime(timestamp))
-
-    print('[{0}] ({1}) < {2}\n....Longitud: {3}'.format(_id,
-                                                        tiempo,
-                                                        mensaje,
-                                                        longitud))
+        print('[{0}] ({1}) < {2}\n....Longitud: {3}'.format(_id,
+                                                            tiempo,
+                                                            mensaje,
+                                                            longitud))
 
 
 def servidor(direccion):
     _id = 0
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_servidor:
-
         socket_servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         socket_servidor.bind(direccion)
         socket_servidor.listen(5)
@@ -108,13 +107,14 @@ def servidor(direccion):
                                                            direccion[1]))
             try:
                 while True:
-                    # Recibir mensaje:
+                    # Recibir mensaje/s:
                     procesar(recibir(socket_cliente))
 
                     # Enviar mensaje:
                     mensaje = input('> ')
                     if mensaje:
                         enviar(socket_cliente, mensaje.encode(), _id)
+
                     else:  # Cortar el chat si se ingresa un mensaje vacio:
                         print('Chat terminado')
                         break
@@ -137,8 +137,8 @@ def cliente(direccion):
                 mensaje = input('> ')
                 if mensaje:
                     enviar(socket_servidor, mensaje.encode(), _id)
-                else:
-                    # Cortar el chat si se ingresa un mensaje vacio.
+
+                else:  # Cortar el chat si se ingresa un mensaje vacío.
                     print('Chat terminado')
                     break
 
@@ -149,13 +149,13 @@ def cliente(direccion):
 
 
 if __name__ == '__main__':
-    # Parametros de la linea de comandos:
+    # Parámetros de la línea de comandos:
     try:
         opts, _ = getopt.getopt(sys.argv[1:], 'csi:p:')
     except getopt.GetoptError as error:
         print('Error con el parámetro {0.opt}: {0.msg}'.format(error))
     else:
-        # Parametros por defecto para host y puerto:
+        # Parámetros por defecto para host y puerto:
         host = 'localhost'
         port = 10000
         modo = ''
@@ -175,7 +175,7 @@ if __name__ == '__main__':
                     print('Error... no se puede ser cliente y servidor al '
                           'mismo tiempo!')
                     sys.exit(1)
-            elif opt == '-i':  # Direccion IP
+            elif opt == '-i':  # Dirección IP
                 host = arg
             elif opt == '-p':  # Puerto
                 port = int(arg)
