@@ -63,8 +63,11 @@ def armar_mensaje(texto):
                    '\nChecksum:             {2}'
                    ).format(len(texto_bytes), tam_comp, cs_crc))
 
-        # Unir ambos en un string de bytes, usando un separador para separar ambos valores:
-        return cs_crc.to_bytes(4, 'big') + tam_comp.to_bytes(1, 'big') + mensaje_comp
+        # Unir ambos en un string de bytes, usando un separador para separar
+        # ambos valores:
+        return cs_crc.to_bytes(4, 'big') \
+            + tam_comp.to_bytes(1, 'big') \
+            + mensaje_comp
 
     except zlib.error as error:
         print('Error al comprimir el mensaje: {}'.format(error))
@@ -155,7 +158,7 @@ def main(argv):
         opts, _ = getopt.getopt(argv[1:], 'csi:p:v')
     except getopt.GetoptError:
         print('Error con los parámetros: ' + str(argv))
-        sys.exit(1)
+        return
 
     # Valores por defecto para host y puerto:
     host = 'localhost'
@@ -167,12 +170,16 @@ def main(argv):
             if modo == '':
                 modo = 'c'
             else:
-                print('Error... no se puede ser cliente y servidor al mismo tiempo!')
+                print('Error... no se puede ser cliente y servidor al mismo '
+                      'tiempo!')
+                return
         elif opt == '-s':  # Modo Servidor
             if modo == '':
                 modo = 's'
             else:
-                print('Error... no se puede ser cliente y servidor al mismo tiempo!')
+                print('Error... no se puede ser cliente y servidor al mismo '
+                      'tiempo!')
+                return
         elif opt == '-i':  # Dirección IP
             host = arg
         elif opt == '-p':  # Puerto

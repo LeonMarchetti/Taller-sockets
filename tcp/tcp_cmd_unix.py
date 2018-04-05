@@ -76,7 +76,8 @@ def server(host, port):
             while True:
                 print('Esperando conexión...')
                 cliente, direccion = servidor.accept()
-                print('Conexión establecida: <{}:{}>'.format(direccion[0], direccion[1]))
+                print('Conexión establecida: <{}:{}>'.format(direccion[0],
+                                                             direccion[1]))
                 try:
                     while True:
                         # Recibir comando:
@@ -128,12 +129,14 @@ def main():
                 if modo == '':
                     modo = 'c'
                 else:
-                    raise ArgExcepcion('Error... no se puede ser cliente y servidor al mismo tiempo!')
+                    raise ArgExcepcion('Error... no se puede ser cliente y '
+                                       'servidor al mismo tiempo!')
             elif opt == '-s':  # Modo Servidor
                 if modo == '':
                     modo = 's'
                 else:
-                    raise ArgExcepcion('Error... no se puede ser cliente y servidor al mismo tiempo!')
+                    raise ArgExcepcion('Error... no se puede ser cliente y '
+                                       'servidor al mismo tiempo!')
             elif opt == '-i':  # Dirección IP
                 host = arg
             elif opt == '-p':  # Puerto

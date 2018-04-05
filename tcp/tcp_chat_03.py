@@ -1,3 +1,4 @@
+# _*_ coding: utf-8 _*_
 import getopt
 import random
 import socket
@@ -14,131 +15,158 @@ mensaje  , variable
 
 """
 
-# Parametros por defecto para host y puerto:
-HOST     = 'localhost'
-PORT     = 65000
-BUFFER  = 1024
+BUFFER = 1024
 ID = 0
 
-def enviar(s, mensaje, id):
-    b_mensaje = mensaje.encode()
 
-    b_longitud = len(b_mensaje).to_bytes(1, 'big')
-    b_id = id.to_bytes(1, 'big')
-    ts = round(time.time()).to_bytes(4, 'big')
+class ConexionTerminadaExcepcion(Exception):
+    pass
 
-    paquete = b_longitud + b_id + ts + b_mensaje
+
+def enviar(s, mensaje, _id):
+    longitud = len(mensaje)
+    ts = round(time.time())
+
+    paquete = (longitud.to_bytes(1, 'big') +
+               _id.to_bytes(4, 'big') +
+               ts.to_bytes(4, 'big') +
+               mensaje)
+
     while paquete:
         enviado = s.send(paquete)
         if enviado == 0:
             raise socket.error()
         paquete = paquete[enviado:]
 
+
 def recibir(s):
-    cachos = []
+    cachos = b''
+    i = 0
     while True:
         cacho = s.recv(BUFFER)
-        cachos.append(cacho)
-        if len(cacho) == 0: # Fin del chat.
-            raise socket.error()
-        if len(cacho) < BUFFER: # Ultimo cacho.
-            break
+        if cacho:
+            cachos += cacho
+            longitud = int.from_bytes(cachos[i:i+1], 'big')
+            if len(cachos) + 1 >= longitud:
+                break
+            # if len(cachos) + 1 == longitud:
+            #     break
+            # elif len(cachos) + 1 > longitud:
+            #     i = longitud
 
-    paquete = b''.join([cacho for cacho in cachos])
+        else:
+            raise ConexionTerminadaExcepcion
 
-    longitud = int.from_bytes(paquete[0:1], 'big')
-    id = int.from_bytes(paquete[1:2], 'big')
-    ts = int.from_bytes(paquete[2:6], 'big')
-    mensaje = paquete[6: 6+longitud]
+    return cachos
 
-    texto = '[id: {}|timestamp: {}]\n{}'.format(id, ts, mensaje.decode())
 
-    if len(mensaje) > longitud:
-        texto += '\nLlego un mensaje mas largo...'
-    elif len(mensaje) < longitud:
-        texto += '\nLlego un mensaje mas corto...'
+def servidor(direccion):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_servidor:
 
-    return texto
+        socket_servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        socket_servidor.bind(direccion)
+        socket_servidor.listen(5)
+        print('Escuchando en <{}:{}>'.format(direccion[0], direccion[1]))
 
-def server():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.bind((HOST, PORT))
-        s.listen(5)
-        print('Escuchando en <{}:{}>'.format(HOST, PORT))
-
-        while True: # Ciclo que acepta las conexiones (un cliente a la vez)
-            print('Esperando conexion...')
-            cliente, direccion = s.accept()
-            print('Conexion establecida: <{}:{}>'.format(direccion[0], direccion[1]))
+        while True:  # Ciclo que acepta las conexiones (un cliente a la vez)
+            print('Esperando conexión...')
+            socket_cliente, direccion = socket_servidor.accept()
+            print('Conexión establecida: <{}:{}>'.format(direccion[0],
+                                                         direccion[1]))
             try:
                 while True:
                     # Recibir mensaje:
-                    print('< ' + recibir(cliente))
+                    procesar(recibir(socket_cliente))
 
                     # Enviar mensaje:
                     mensaje = input('> ')
                     if mensaje:
-                        enviar(cliente, mensaje, 0)
-                    else:
-                        # Cortar el chat si se ingresa un mensaje vacio.
+                        enviar(socket_cliente, mensaje.encode(), 0)
+                    else:  # Cortar el chat si se ingresa un mensaje vacio:
+                        print('Chat terminado')
                         break
-            except socket.error:
-                pass
-            finally:
-                cliente.close()
 
-def client():
-    id = random.randint(1, 255)
-    print('Cliente con id: "{}"'.format(id))
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((HOST, PORT))
+            except ConexionTerminadaExcepcion:
+                print('Chat terminado')
+
+            finally:
+                socket_cliente.close()
+
+            print('--------------------')
+
+
+def cliente(direccion):
+    _id = random.randint(1, 255)
+    print('Cliente con id: "{}"'.format(_id))
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_servidor:
+        socket_servidor.connect(direccion)
         try:
             while True:
                 # Enviar mensaje:
                 mensaje = input('> ')
                 if mensaje:
-                    enviar(s, mensaje, id)
+                    enviar(socket_servidor, mensaje.encode(), _id)
                 else:
                     # Cortar el chat si se ingresa un mensaje vacio.
+                    print('Chat terminado')
                     break
 
                 # Recibir mensaje:
-                print('< ' + recibir(s))
-        except socket.error:
-            pass
+                procesar(recibir(socket_servidor))
+        except ConexionTerminadaExcepcion:
+            print('Chat terminado')
+
+
+def procesar(mensaje):
+    longitud = int.from_bytes(mensaje[:1], 'big')
+    _id = int.from_bytes(mensaje[1:5], 'big')
+    timestamp = int.from_bytes(mensaje[5:9], 'big')
+    texto = mensaje[9:].decode()
+
+    tiempo = time.strftime('%H:%M:%S %z', time.localtime(timestamp))
+
+    print('[{0}] ({1}) < {2}\n....Longitud: {3}'.format(_id,
+                                                        tiempo,
+                                                        texto,
+                                                        longitud))
+
 
 if __name__ == '__main__':
 
     # Parametros de la linea de comandos:
     try:
         opts, _ = getopt.getopt(sys.argv[1:], 'csi:p:')
-    except getopt.GetoptError:
-        print('Error con los parametros: ' + str(sys.argv))
-        sys.exit(1)
+    except getopt.GetoptError as error:
+        print('Error con el parámetro {0.opt}: {0.msg}'.format(error))
+    else:
+        # Parametros por defecto para host y puerto:
+        host = 'localhost'
+        port = 10000
+        modo = ''
 
-    modo = ''
+        for opt, arg in opts:
+            if opt == '-c':  # Modo Cliente
+                if modo == '':
+                    modo = 'c'
+                else:
+                    print('Error... no se puede ser cliente y servidor al '
+                          'mismo tiempo!')
+                    sys.exit(1)
+            elif opt == '-s':  # Modo Servidor
+                if modo == '':
+                    modo = 's'
+                else:
+                    print('Error... no se puede ser cliente y servidor al '
+                          'mismo tiempo!')
+                    sys.exit(1)
+            elif opt == '-i':  # Direccion IP
+                host = arg
+            elif opt == '-p':  # Puerto
+                port = int(arg)
 
-    for opt, arg in opts:
-        if opt == '-c': # Modo Cliente
-            if modo == '':
-                modo = 'c'
-            else:
-                print('Error... no se puede ser cliente y servidor al mismo tiempo!')
-        elif opt == '-s': # Modo Servidor
-            if modo == '':
-                modo = 's'
-            else:
-                print('Error... no se puede ser cliente y servidor al mismo tiempo!')
-        elif opt == '-i': # Direccion IP
-            HOST = arg
-        elif opt == '-p': # Puerto
-            PORT = int(arg)
-
-    if modo == '':
-        print('Usar "-c" para modo Cliente y "-s" para modo Servidor')
-    elif modo == 's':
-        server()
-    elif modo == 'c':
-        client()
+        if modo == '':
+            print('Usar "-c" para modo Cliente y "-s" para modo Servidor')
+        elif modo == 's':
+            servidor((host, port))
+        elif modo == 'c':
+            cliente((host, port))
