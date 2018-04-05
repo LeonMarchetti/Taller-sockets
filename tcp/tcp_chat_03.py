@@ -1,22 +1,34 @@
 # _*_ coding: utf-8 _*_
+"""
+Parámetros:
+* -s: Modo servidor
+* -c: Modo cliente
+* -i: Dirección IP (Opcional)
+* -p: Número de puerto (Opcional)
+
+Estructura del mensaje:
+ 0 1     4 5     8 9
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|l|  id   |  ts   | mensaje |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+l: 1 byte
+    Longitud del mensaje
+
+id: 4 bytes
+    Identificador del emisor.
+
+ts: 4 bytes
+    Timestamp del envío del mensaje.
+
+mensaje: variable
+    Mensaje.
+"""
 import getopt
 import random
 import socket
 import sys
 import time
-
-"""
-
-Estructura:
-Longitud , 1 byte
-ID       , 1 byte
-timestamp, 4 bytes
-mensaje  , variable
-
-"""
-
-BUFFER = 1024
-ID = 0
 
 
 class ConexionTerminadaExcepcion(Exception):
@@ -35,7 +47,7 @@ def enviar(s, mensaje, _id):
     while paquete:
         enviado = s.send(paquete)
         if enviado == 0:
-            raise socket.error()
+            raise ConexionTerminadaExcepcion
         paquete = paquete[enviado:]
 
 
@@ -43,16 +55,18 @@ def recibir(s):
     cachos = b''
     i = 0
     while True:
-        cacho = s.recv(BUFFER)
+        cacho = s.recv(1024)
         if cacho:
             cachos += cacho
-            longitud = int.from_bytes(cachos[i:i+1], 'big')
-            if len(cachos) + 1 >= longitud:
+
+            # longitud: 1 (long) + 4 (id) + 4(td) + len(mensaje)
+            longitud = int.from_bytes(cachos[i:i+1], 'big') + 9
+            if len(cachos) == longitud:
                 break
-            # if len(cachos) + 1 == longitud:
-            #     break
-            # elif len(cachos) + 1 > longitud:
-            #     i = longitud
+            elif len(cachos) > longitud:
+                # Si llega una parte de otro mensaje, corro el byte de donde
+                # leo la longitud para leer la longitud del siguiente mensaje:
+                i = longitud
 
         else:
             raise ConexionTerminadaExcepcion
@@ -60,7 +74,24 @@ def recibir(s):
     return cachos
 
 
+def procesar(paquete):
+    # Parseo del paquete:
+    longitud = int.from_bytes(paquete[:1], 'big')
+    _id = int.from_bytes(paquete[1:5], 'big')
+    timestamp = int.from_bytes(paquete[5:9], 'big')
+    mensaje = paquete[9:].decode()
+
+    # Conversión de la hora:
+    tiempo = time.strftime('%H:%M:%S %z', time.localtime(timestamp))
+
+    print('[{0}] ({1}) < {2}\n....Longitud: {3}'.format(_id,
+                                                        tiempo,
+                                                        mensaje,
+                                                        longitud))
+
+
 def servidor(direccion):
+    _id = 0
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_servidor:
 
         socket_servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -69,10 +100,12 @@ def servidor(direccion):
         print('Escuchando en <{}:{}>'.format(direccion[0], direccion[1]))
 
         while True:  # Ciclo que acepta las conexiones (un cliente a la vez)
+            print('--------------------')
             print('Esperando conexión...')
             socket_cliente, direccion = socket_servidor.accept()
-            print('Conexión establecida: <{}:{}>'.format(direccion[0],
-                                                         direccion[1]))
+            print('--------------------')
+            print('Conexión establecida: <{}:{}>\n'.format(direccion[0],
+                                                           direccion[1]))
             try:
                 while True:
                     # Recibir mensaje:
@@ -81,7 +114,7 @@ def servidor(direccion):
                     # Enviar mensaje:
                     mensaje = input('> ')
                     if mensaje:
-                        enviar(socket_cliente, mensaje.encode(), 0)
+                        enviar(socket_cliente, mensaje.encode(), _id)
                     else:  # Cortar el chat si se ingresa un mensaje vacio:
                         print('Chat terminado')
                         break
@@ -91,8 +124,6 @@ def servidor(direccion):
 
             finally:
                 socket_cliente.close()
-
-            print('--------------------')
 
 
 def cliente(direccion):
@@ -117,22 +148,7 @@ def cliente(direccion):
             print('Chat terminado')
 
 
-def procesar(mensaje):
-    longitud = int.from_bytes(mensaje[:1], 'big')
-    _id = int.from_bytes(mensaje[1:5], 'big')
-    timestamp = int.from_bytes(mensaje[5:9], 'big')
-    texto = mensaje[9:].decode()
-
-    tiempo = time.strftime('%H:%M:%S %z', time.localtime(timestamp))
-
-    print('[{0}] ({1}) < {2}\n....Longitud: {3}'.format(_id,
-                                                        tiempo,
-                                                        texto,
-                                                        longitud))
-
-
 if __name__ == '__main__':
-
     # Parametros de la linea de comandos:
     try:
         opts, _ = getopt.getopt(sys.argv[1:], 'csi:p:')
