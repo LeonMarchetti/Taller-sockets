@@ -48,6 +48,7 @@ def enviar(s, mensaje, _id):
         enviado = s.send(paquete)
         if enviado == 0:
             raise ConexionTerminadaExcepcion
+
         paquete = paquete[enviado:]
 
 
@@ -144,6 +145,7 @@ def cliente(direccion):
 
                 # Recibir mensaje:
                 procesar(recibir(socket_servidor))
+
         except ConexionTerminadaExcepcion:
             print('Chat terminado')
 
