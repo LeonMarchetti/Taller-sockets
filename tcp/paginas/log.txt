@@ -838,3 +838,107 @@ Vary: Accept-Encoding
 X-Cache: MISS from server10-HP-Z800-Workstation
 X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
 Connection: close
+[www.scintilla.org]
+HTTP/1.1 301 Moved Permanently
+Date: Thu, 05 Apr 2018 19:14:25 GMT
+Server: Apache
+Location: https://www.scintilla.org/
+Content-Length: 234
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+[www.scintilla.org]
+HTTP/1.1 501 Not Implemented
+Server: squid/3.5.12
+Mime-Version: 1.0
+Date: Thu, 05 Apr 2018 19:17:38 GMT
+Content-Type: text/html;charset=utf-8
+Content-Length: 3487
+X-Squid-Error: ERR_UNSUP_REQ 0
+Vary: Accept-Language
+Content-Language: en
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: NONE from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.scintilla.org]
+HTTP/1.1 501 Not Implemented
+Server: squid/3.5.12
+Mime-Version: 1.0
+Date: Thu, 05 Apr 2018 19:20:25 GMT
+Content-Type: text/html;charset=utf-8
+Content-Length: 3487
+X-Squid-Error: ERR_UNSUP_REQ 0
+Vary: Accept-Language
+Content-Language: en
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: NONE from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.scintilla.org\SciTEDoc.html]
+HTTP/1.1 503 Service Unavailable
+Server: squid/3.5.12
+Mime-Version: 1.0
+Date: Thu, 05 Apr 2018 19:21:12 GMT
+Content-Type: text/html;charset=utf-8
+Content-Length: 3779
+X-Squid-Error: ERR_DNS_FAIL 0
+Vary: Accept-Language
+Content-Language: en
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.scintilla.org]
+HTTP/1.1 501 Not Implemented
+Server: squid/3.5.12
+Mime-Version: 1.0
+Date: Thu, 05 Apr 2018 19:22:47 GMT
+Content-Type: text/html;charset=utf-8
+Content-Length: 3487
+X-Squid-Error: ERR_UNSUP_REQ 0
+Vary: Accept-Language
+Content-Language: en
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: NONE from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.scintilla.org]
+HTTP/1.1 501 Not Implemented
+Server: squid/3.5.12
+Mime-Version: 1.0
+Date: Thu, 05 Apr 2018 19:23:42 GMT
+Content-Type: text/html;charset=utf-8
+Content-Length: 3487
+X-Squid-Error: ERR_UNSUP_REQ 0
+Vary: Accept-Language
+Content-Language: en
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: NONE from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.scintilla.org]
+HTTP/1.1 501 Not Implemented
+Server: squid/3.5.12
+Mime-Version: 1.0
+Date: Thu, 05 Apr 2018 19:24:50 GMT
+Content-Type: text/html;charset=utf-8
+Content-Length: 3487
+X-Squid-Error: ERR_UNSUP_REQ 0
+Vary: Accept-Language
+Content-Language: en
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: NONE from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.unlu.edu.ar]
+HTTP/1.1 200 OK
+Date: Thu, 05 Apr 2018 19:27:01 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
+[www.unlu.edu.ar/institucional.html]
+HTTP/1.1 200 OK
+Date: Thu, 05 Apr 2018 19:33:42 GMT
+Server: Apache/2.4.10 (Debian)
+Vary: Accept-Encoding
+Content-Type: text/html; charset=iso-8859-1
+X-Cache: MISS from server10-HP-Z800-Workstation
+X-Cache-Lookup: MISS from server10-HP-Z800-Workstation:3128
+Connection: close
