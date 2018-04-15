@@ -16,21 +16,23 @@ import socket
 import subprocess
 import sys
 import time
-
-
-class ConexionTerminadaExcepcion(Exception):
-    pass
+# noinspection PyUnresolvedReferences
+from urllib.parse import parse_qsl, urlparse
 
 
 BUFFER = 1024
-
-lineas_status = {
+STATUS = {
     200: 'HTTP/1.0 200 OK\r\n',
     400: 'HTTP/1.1 400 Solicitud Incorrecta\r\n',
     404: 'HTTP/1.0 404 No encontrado\r\n',
 }
 
 
+class ConexionTerminadaExcepcion(Exception):
+    pass
+
+
+# noinspection PyUnusedLocal,PyUnresolvedReferences
 def guarderia(signum, frame):
     """When a child process exits, the kernel sends a SIGCHLD signal. The
     parent process can set up a signal handler to be asynchronously notified of
@@ -56,21 +58,77 @@ def enviar(s, datos):
         datos = datos[enviado:]
 
 
-def recibir(s):
-    cachos = []
-    while True:
-        cacho = s.recv(BUFFER)
-        if cacho == b'':
-            raise ConexionTerminadaExcepcion()
+def recibir_http_request(s):
+    # Primero recibo el header:
+    cachos = b''
+    f = -1
+    while f == -1:
+        cacho = s.recv(1024)
+        if cacho:
+            cachos += cacho
+            f = cachos.find(b'\r\n\r\n')
 
-        f = cacho.find(b'\r\n\r\n')
-        if f > -1:
-            cachos.append(cacho[:f])
-            break
         else:
-            cachos.append(cacho)
+            raise ConexionTerminadaExcepcion
 
-    return ''.join([cacho.decode() for cacho in cachos])
+    # Proceso el header:
+    headers = parsear_header_request(cachos[:f])
+    cachos = cachos[f+4:]
+
+    if 'GET' in headers:
+        pass
+
+    elif 'POST' in headers:
+        if 'Content-Length' in headers:
+            content_length = int(headers['Content-Length'])
+            while len(cachos) < content_length:
+                cacho = s.recv(1024)
+                if cacho:
+                    cachos += cacho
+                else:
+                    raise ConexionTerminadaExcepcion
+
+        else:
+            # Si el mensaje no trae la longitud del contenido entonces recibo
+            # bytes hasta que se termine la conexión:
+            while True:
+                cacho = s.recv(1024)
+                if cacho:
+                    cachos += cacho
+                else:
+                    break
+
+    else:
+        raise RuntimeError('Método HTTP no soportado')
+
+    # Regreso el método, los encabezados y el cuerpo:
+    return headers, cachos
+
+
+def parsear_header_request(header):
+    lista_headers = header.split(b'\r\n')
+
+    # Separo la línea del pedido y obtengo el método:
+    request_line = lista_headers.pop(0).decode('ISO-8859-1')
+    print(request_line)
+
+    # Parseo el pedido:
+    request_line_match = re.match('^(GET|POST|HEAD) \/(.*) HTTP\/\d\.\d$',
+                                  request_line)
+    request_method = request_line_match.group(1)
+    request_uri = request_line_match.group(2)
+
+    # Diccionario con los encabezados
+    headers_dict = {request_method: request_uri}
+
+    # Armo el diccionario con los encabezados:
+    # headers_dict = {}
+    for linea in lista_headers:
+        linea_str = linea.decode('ISO-8859-1')
+        n = linea_str.find(': ')
+        headers_dict[linea_str[:n]] = linea_str[n + 2:]
+
+    return headers_dict
 
 
 def ejecutar_php(script):
@@ -78,129 +136,132 @@ def ejecutar_php(script):
     return p.stdout.read()
 
 
-def buscar_recurso(pedido):
-    if pedido:
-        archivo = 'paginas/' + pedido.group(2)
-        estado = 200
+# noinspection PyUnusedLocal
+def buscar_recurso(headers, cuerpo_post):
 
-        tipo_mime = mimetypes.guess_type(archivo)[0]
-        if tipo_mime is None:
-            tipo_mime = 'text/plain'
+    if 'GET' in headers:
+        u = urlparse(headers['GET'])
+        # query = parse_qsl(u.query)
 
-        if not os.path.isfile(archivo):
-            # Página/recurso especial por si no se encuentra el recurso:
-            archivo = 'paginas/no_encontrado' + mimetypes.guess_extension(tipo_mime)
-            estado = 404
+    elif 'POST' in headers:
+        u = urlparse(headers['POST'])
+        # query = parse_qsl(cuerpo)
+
     else:
-        # Página especial por si el mensaje está mal redactado:
-        archivo = 'paginas/bad_request.html'
-        estado = 400
-        tipo_mime = 'text/html'
-        
-    return archivo, estado, tipo_mime
+        raise NotImplementedError('Solo se soporta GET y POST...')
 
+    path = 'paginas/' + u.path
+    tipo_mime = mimetypes.guess_type(path)[0]
 
-def procesar(mensaje):
-    linea_pedido = mensaje[:mensaje.find('\r\n')]
-    print('Recibido: "{}"'.format(linea_pedido))
+    if os.path.isfile(path):
+        status_line = STATUS[200]
 
-    # Parseo el pedido:
-    pedido = re.match(r'^(GET|POST) \/([^?=&\s]*)(?:\?(.*))? HTTP\/(?:1\.0|1\.1|2\.0)$',
-                      linea_pedido)
-    archivo, estado, tipo_mime = buscar_recurso(pedido)
-
-    # Cabeceras de HTTP:
-    linea_status = lineas_status[estado]
-    print('Enviando "{}"'.format(linea_status))
-
-    linea_date = 'Date: {}\r\n'.format(time.strftime('%a, %d %b %Y %H:%M:%S %Z',
-                                                     time.localtime()))
+    else:
+        status_line = STATUS[404]
+        path = 'paginas/no_encontrado' + \
+               mimetypes.guess_extension(tipo_mime)
 
     # Abro el archivo del recurso. Si es un script PHP entonces lo ejecuto:
-    if os.path.splitext(archivo)[1] == '.php':
-        body = ejecutar_php(archivo)
+    if os.path.splitext(path)[1] == '.php':
+        p = subprocess.Popen('php ' + path, shell=True, stdout=subprocess.PIPE)
+        cuerpo = p.stdout.read()
         tipo_mime = 'text/html'
+
     else:
-        body = b''
-        with open(archivo, 'rb') as f:
+        cuerpo = b''
+        with open(path, 'rb') as f:
             for linea in f:
-                body += linea
+                cuerpo += linea
 
-    linea_contenttype = 'Content-Type: {};charset=utf-8\r\n'.format(tipo_mime)
-    linea_contentlength = 'Content-Length: {}\r\n'.format(len(body))
+    # Cabeceras HTTP:
+    fecha = 'Date: {}\r\n'.format(time.strftime('%a, %d %b %Y %H:%M:%S %Z',
+                                                time.localtime()))
+    tipo_contenido = 'Content-Type: {};charset=utf-8\r\n'.format(tipo_mime)
 
-    # Armo la respuesta:
-    return (linea_status.encode('ISO-8859-1') +
-            linea_date.encode('ISO-8859-1') +
-            linea_contenttype.encode('ISO-8859-1') +
-            linea_contentlength.encode('ISO-8859-1') +
+    return (status_line.encode() +
+            fecha.encode() +
+            tipo_contenido.encode() +
             b'\r\n' +
-            body)
+            cuerpo)
 
 
-def server(host, port):
-    servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+def servidor(direccion):
+    socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        # servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        servidor.bind((host, port))
-        servidor.listen(5)
-        print('Escuchando en <{}:{}>'.format(host, port))
+        socket_servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        socket_servidor.bind((host, port))
+        socket_servidor.listen(5)
+        print('Escuchando en <{}:{}>'.format(direccion[0], direccion[1]))
 
         signal.signal(signal.SIGCHLD, guarderia)
 
         while True:
+            print('--------------------')
             print('Esperando conexión...')
             try:
-                cliente, direccion = servidor.accept()
+                socket_cliente, direccion_cliente = socket_servidor.accept()
+
             except IOError as e:
                 codigo, msg = e.args
                 if codigo == errno.EINTR:
                     continue
+
                 else:
+                    print('Error: {}'.format(msg))
                     raise
 
             # Forkeo el proceso: El hijo  se encarga de atender al cliente
             pid = os.fork()
-            if pid == 0:
-                servidor.close()
+            if pid == 0:  # Proceso hijo:
+                servidor_hijo(socket_servidor, socket_cliente)
 
-                try:
-                    # Recibe pedido y responde:
-                    pedido = recibir(cliente)
-                    respuesta = procesar(pedido)
-                    enviar(cliente, respuesta)
+            else:  # Proceso padre:
+                socket_cliente.close()
 
-                except ConexionTerminadaExcepcion:
-                    print('Conexión terminada')
-
-                finally:
-                    print('Cerrando hijo...')
-                    cliente.close()
-                    os._exit(0)
-
-            else:
+                print('--------------------')
                 print('Conexión establecida: ' +
-                      '<{}:{}> con subproceso <{}>'.format(direccion[0],
-                                                           direccion[1],
-                                                           pid))
-                cliente.close()
+                      '<{}:{}> con subproceso <{}>\n'.format(
+                          direccion_cliente[0],
+                          direccion_cliente[1],
+                          pid))
 
     except KeyboardInterrupt:
         print('Programa terminado')
+
     finally:
-        servidor.close()
+        socket_servidor.close()
 
 
-def main(argv):
+# noinspection PyProtectedMember
+def servidor_hijo(socket_servidor, socket_cliente):
+    socket_servidor.close()
+
     try:
-        # Parámetros de la línea de comandos:
-        opts, _ = getopt.getopt(argv[1:], 'i:p:')
+        # Recibe pedido y responde:
+        headers, cuerpo = recibir_http_request(socket_cliente)
+        paquete = buscar_recurso(headers, cuerpo)
+        enviar(socket_cliente, paquete)
 
-        # Valores por defecto para host y puerto:
-        # host = 'localhost'
-        host = '192.168.1.42'
-        port = 8000
+    except ConexionTerminadaExcepcion:
+        print('Conexión terminada')
+
+    finally:
+        print('Cerrando hijo...')
+        socket_cliente.close()
+        os._exit(0)
+
+
+if __name__ == '__main__':
+    # Parámetros de la línea de comandos:
+    try:
+        opts, _ = getopt.getopt(sys.argv[1:], 'i:p:')
+    except getopt.GetoptError as error:
+        print('Error con el parámetro {0.opt}: {0.msg}'.format(error))
+    else:
+        # Parámetros por defecto para host y puerto:
+        host = 'localhost'
+        port = 8080
+        modo = ''
 
         for opt, arg in opts:
             if opt == '-i':  # Dirección IP
@@ -208,11 +269,4 @@ def main(argv):
             elif opt == '-p':  # Puerto
                 port = int(arg)
 
-        server(host, port)
-
-    except getopt.GetoptError:
-        print('Error con los parámetros: ' + str(sys.argv))
-
-
-if __name__ == '__main__':
-    main(sys.argv)
+        servidor((host, port))
