@@ -1,19 +1,15 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 """
 Parámetros:
 * -i Dirección IP o nombre de Host
 * -p Número de puerto
 """
-
-import errno
 import fnmatch
 import getopt
 import mimetypes
-import os
 import os.path
 import re
-import signal
-import socket
+from servidor_fork import ServidorFork
 import subprocess
 import sys
 import time
@@ -33,33 +29,6 @@ class ConexionTerminadaExcepcion(Exception):
     pass
 
 
-# noinspection PyUnusedLocal,PyUnresolvedReferences
-def guarderia(signum, frame):
-    """When a child process exits, the kernel sends a SIGCHLD signal. The
-    parent process can set up a signal handler to be asynchronously notified of
-    that SIGCHLD event and then it can wait for the child to collect its
-    termination status, thus preventing the zombie process from being left
-    around.
-    """
-    while True:
-        try:
-            pid, estado = os.waitpid(-1, os.WNOHANG)
-        except OSError:
-            return
-
-        if pid == 0:
-            return
-
-
-def enviar(s, datos):
-    while datos:
-        enviado = s.send(datos)
-        if enviado == 0:
-            raise ConexionTerminadaExcepcion()
-
-        datos = datos[enviado:]
-
-
 def parsear_header_request(header_completo):
     lista_headers = header_completo.split(b'\r\n')
 
@@ -70,10 +39,12 @@ def parsear_header_request(header_completo):
     # Parseo el pedido:
     request_line_match = re.match('^(GET|POST|HEAD) \/(.*) HTTP\/\d\.\d$',
                                   request_line)
+    request_method = request_line_match.group(1)
+    request_uri = request_line_match.group(2)
 
     # Diccionario con los encabezados
-    headers_dict = {'Request-Method': request_line_match.group(1),
-                    'Request-URI': request_line_match.group(2)}
+    headers_dict = {'Request-Method': request_method,
+                    'Request-URI': request_uri}
 
     # Armo el diccionario con los encabezados:
     for linea in lista_headers:
@@ -137,7 +108,7 @@ def ejecutar_php(script):
     p = subprocess.Popen('php ' + script,
                          shell=True,
                          stdout=subprocess.PIPE)
-    return p.stdout.read()
+    return p.stdout.read() + p.stderr.read()
 
 
 def verificar_aceptacion_tipo(accept, tipo_mime):
@@ -172,6 +143,9 @@ def buscar_recurso(headers_pedido, cuerpo_pedido):
         raise NotImplementedError('Solo se soporta GET, HEAD y POST...')
 
     archivo = 'paginas/' + u.path
+    if archivo == 'paginas/':
+        archivo = 'paginas/pagina1.html'
+
     tipo_mime = mimetypes.guess_type(archivo)[0]
 
     # Verifico si el cliente acepta el tipo de contenido:
@@ -198,7 +172,10 @@ def buscar_recurso(headers_pedido, cuerpo_pedido):
             # Abro el archivo del recurso. Si es un script PHP entonces lo
             # ejecuto:
             if os.path.splitext(archivo)[1] == '.php':
-                cuerpo = ejecutar_php(archivo)
+                p = subprocess.Popen('php ' + archivo,
+                                     shell=True,
+                                     stdout=subprocess.PIPE)
+                cuerpo = p.stdout.read()
 
             else:
                 cuerpo = b''
@@ -222,67 +199,10 @@ def buscar_recurso(headers_pedido, cuerpo_pedido):
             cuerpo)
 
 
-# noinspection PyProtectedMember
-def servidor_hijo(socket_servidor, socket_cliente):
-    socket_servidor.close()
-
-    try:
-        # Recibe pedido y responde:
-        headers, cuerpo = recibir_http_request(socket_cliente)
-        paquete = buscar_recurso(headers, cuerpo)
-        enviar(socket_cliente, paquete)
-
-    except ConexionTerminadaExcepcion:
-        print('[{}] Conexión terminada'.format(os.getpid()))
-
-    finally:
-        socket_cliente.close()
-        os._exit(0)
-
-
-def servidor(direccion):
-    mimetypes.add_type('text/html', '.php')
-    socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        socket_servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        socket_servidor.bind((host, port))
-        socket_servidor.listen(5)
-        print('Escuchando en <{}:{}>'.format(direccion[0], direccion[1]))
-
-        signal.signal(signal.SIGCHLD, guarderia)
-
-        while True:
-            try:
-                socket_cliente, direccion_cliente = socket_servidor.accept()
-
-            except IOError as e:
-                codigo, msg = e.args
-                if codigo == errno.EINTR:
-                    continue
-
-                else:
-                    print('Error: {}'.format(msg))
-                    raise
-
-            # Forkeo el proceso: El hijo  se encarga de atender al cliente
-            pid = os.fork()
-            if pid == 0:
-                servidor_hijo(socket_servidor, socket_cliente)
-
-            else:
-                socket_cliente.close()
-
-                print('Conexión establecida: ' +
-                      '<{}:{}> con subproceso <{}>'.format(
-                          direccion_cliente[0],
-                          direccion_cliente[1],
-                          pid))
-
-    except KeyboardInterrupt:
-        print('Programa terminado')
-
-    finally:
-        socket_servidor.close()
+def proceso(socket_cliente):
+    headers, cuerpo = recibir_http_request(socket_cliente)
+    salida = buscar_recurso(headers, cuerpo)
+    return salida
 
 
 if __name__ == '__main__':
@@ -303,4 +223,4 @@ if __name__ == '__main__':
             elif opt == '-p':  # Puerto
                 port = int(arg)
 
-        servidor((host, port))
+        ServidorFork((host, port), proceso)
