@@ -6,6 +6,7 @@ Parámetros:
 """
 
 import errno
+import fnmatch
 import getopt
 import mimetypes
 import os
@@ -20,11 +21,11 @@ import time
 from urllib.parse import parse_qsl, urlparse
 
 
-BUFFER = 1024
 STATUS = {
     200: 'HTTP/1.0 200 OK\r\n',
-    400: 'HTTP/1.1 400 Solicitud Incorrecta\r\n',
-    404: 'HTTP/1.0 404 No encontrado\r\n',
+    400: 'HTTP/1.0 400 Bad Request\r\n',
+    404: 'HTTP/1.0 404 Not Found\r\n',
+    406: 'HTTP/1.0 406 Not Acceptable\r\n',
 }
 
 
@@ -55,7 +56,34 @@ def enviar(s, datos):
         enviado = s.send(datos)
         if enviado == 0:
             raise ConexionTerminadaExcepcion()
+
         datos = datos[enviado:]
+
+
+def parsear_header_request(header_completo):
+    lista_headers = header_completo.split(b'\r\n')
+
+    # Separo la línea del pedido y obtengo el método:
+    request_line = lista_headers.pop(0).decode('ISO-8859-1')
+    print('[{0}] {1}'.format(os.getpid(), request_line))
+
+    # Parseo el pedido:
+    request_line_match = re.match('^(GET|POST|HEAD) \/(.*) HTTP\/\d\.\d$',
+                                  request_line)
+    request_method = request_line_match.group(1)
+    request_uri = request_line_match.group(2)
+
+    # Diccionario con los encabezados
+    headers_dict = {'Request-Method': request_method}
+    headers_dict['Request-URI'] = request_uri
+
+    # Armo el diccionario con los encabezados:
+    for linea in lista_headers:
+        linea_str = linea.decode('ISO-8859-1')
+        n = linea_str.find(': ')
+        headers_dict[linea_str[:n]] = linea_str[n + 2:]
+
+    return headers_dict
 
 
 def recibir_http_request(s):
@@ -75,10 +103,12 @@ def recibir_http_request(s):
     headers = parsear_header_request(cachos[:f])
     cachos = cachos[f+4:]
 
-    if 'GET' in headers:
+    if headers['Request-Method'] in ('GET', 'HEAD'):
         pass
 
-    elif 'POST' in headers:
+    elif headers['Request-Method'] == 'POST':
+        # Si el mensaje trae la longitud del contenido entonces recibo tantos
+        # bytes como indique el encabezado:
         if 'Content-Length' in headers:
             content_length = int(headers['Content-Length'])
             while len(cachos) < content_length:
@@ -99,85 +129,95 @@ def recibir_http_request(s):
                     break
 
     else:
-        raise RuntimeError('Método HTTP no soportado')
+        raise NotImplementedError('Solo se soporta GET, HEAD y POST...')
 
     # Regreso el método, los encabezados y el cuerpo:
     return headers, cachos
 
 
-def parsear_header_request(header):
-    lista_headers = header.split(b'\r\n')
-
-    # Separo la línea del pedido y obtengo el método:
-    request_line = lista_headers.pop(0).decode('ISO-8859-1')
-    print(request_line)
-
-    # Parseo el pedido:
-    request_line_match = re.match('^(GET|POST|HEAD) \/(.*) HTTP\/\d\.\d$',
-                                  request_line)
-    request_method = request_line_match.group(1)
-    request_uri = request_line_match.group(2)
-
-    # Diccionario con los encabezados
-    headers_dict = {request_method: request_uri}
-
-    # Armo el diccionario con los encabezados:
-    # headers_dict = {}
-    for linea in lista_headers:
-        linea_str = linea.decode('ISO-8859-1')
-        n = linea_str.find(': ')
-        headers_dict[linea_str[:n]] = linea_str[n + 2:]
-
-    return headers_dict
-
-
 def ejecutar_php(script):
-    p = subprocess.Popen('php ' + script, shell=True, stdout=subprocess.PIPE)
-    return p.stdout.read()
+    p = subprocess.Popen('php ' + script,
+                         shell=True,
+                         stdout=subprocess.PIPE)
+    return p.stdout.read() + p.stderr.read()
 
+
+def verificar_aceptacion_tipo(accept, tipo_mime):
+    accept_matches = re.findall(r'(\w+\/(?:\w+|\*))', accept)
+    if accept_matches:
+        for accept_tipo in accept_matches:
+            if fnmatch.fnmatch(tipo_mime, accept_tipo):
+                return True
+
+    return False
 
 # noinspection PyUnusedLocal
-def buscar_recurso(headers, cuerpo_post):
+def buscar_recurso(headers_pedido, cuerpo_pedido):
 
-    if 'GET' in headers:
-        u = urlparse(headers['GET'])
+    header_solo = False
+
+    # Parseo el pedido:
+    if headers_pedido['Request-Method'] == 'GET':
+        u = urlparse(headers_pedido['Request-URI'])
         # query = parse_qsl(u.query)
 
-    elif 'POST' in headers:
-        u = urlparse(headers['POST'])
-        # query = parse_qsl(cuerpo)
+    elif headers_pedido['Request-Method'] == 'POST':
+        u = urlparse(headers_pedido['Request-URI'])
+        # query = parse_qsl(cuerpo_pedido)
+
+    elif headers_pedido['Request-Method'] == 'HEAD':
+        u = urlparse(headers_pedido['Request-URI'])
+        header_solo = True
 
     else:
-        raise NotImplementedError('Solo se soporta GET y POST...')
+        raise NotImplementedError('Solo se soporta GET, HEAD y POST...')
 
-    path = 'paginas/' + u.path
-    tipo_mime = mimetypes.guess_type(path)[0]
+    archivo = 'paginas/' + u.path
+    tipo_mime = mimetypes.guess_type(archivo)[0]
 
-    if os.path.isfile(path):
-        status_line = STATUS[200]
+    # Verifico si el cliente acepta el tipo de contenido:
+    if 'Accept' in headers_pedido and \
+       not verificar_aceptacion_tipo(headers_pedido['Accept'], tipo_mime):
 
-    else:
-        status_line = STATUS[404]
-        path = 'paginas/no_encontrado' + \
-               mimetypes.guess_extension(tipo_mime)
-
-    # Abro el archivo del recurso. Si es un script PHP entonces lo ejecuto:
-    if os.path.splitext(path)[1] == '.php':
-        p = subprocess.Popen('php ' + path, shell=True, stdout=subprocess.PIPE)
-        cuerpo = p.stdout.read()
-        tipo_mime = 'text/html'
+        status_line = STATUS[406]
+        cuerpo = tipo_mime
 
     else:
-        cuerpo = b''
-        with open(path, 'rb') as f:
-            for linea in f:
-                cuerpo += linea
+        # Verifico si existe el recurso pedido:
+        if os.path.isfile(archivo):
+            status_line = STATUS[200]
+
+        else:
+            status_line = STATUS[404]
+            archivo = 'paginas/no_encontrado' + \
+                      mimetypes.guess_extension(tipo_mime)
+
+        if header_solo:
+            cuerpo = b''
+
+        else:
+            # Abro el archivo del recurso. Si es un script PHP entonces lo ejecuto:
+            if os.path.splitext(archivo)[1] == '.php':
+                p = subprocess.Popen('php ' + archivo,
+                                     shell=True,
+                                     stdout=subprocess.PIPE)
+                cuerpo = p.stdout.read()
+
+            else:
+                cuerpo = b''
+                if archivo != '':
+                    with open(archivo, 'rb') as f:
+                        for linea in f:
+                            cuerpo += linea
 
     # Cabeceras HTTP:
     fecha = 'Date: {}\r\n'.format(time.strftime('%a, %d %b %Y %H:%M:%S %Z',
                                                 time.localtime()))
     tipo_contenido = 'Content-Type: {};charset=utf-8\r\n'.format(tipo_mime)
 
+    print('[{0}] {1}'.format(os.getpid(), status_line.strip()))
+
+    # Armado y retorno del paquete:
     return (status_line.encode() +
             fecha.encode() +
             tipo_contenido.encode() +
@@ -185,7 +225,26 @@ def buscar_recurso(headers, cuerpo_post):
             cuerpo)
 
 
+# noinspection PyProtectedMember
+def servidor_hijo(socket_servidor, socket_cliente):
+    socket_servidor.close()
+
+    try:
+        # Recibe pedido y responde:
+        headers, cuerpo = recibir_http_request(socket_cliente)
+        paquete = buscar_recurso(headers, cuerpo)
+        enviar(socket_cliente, paquete)
+
+    except ConexionTerminadaExcepcion:
+        print('[{}] Conexión terminada'.format(os.getpid()))
+
+    finally:
+        socket_cliente.close()
+        os._exit(0)
+
+
 def servidor(direccion):
+    mimetypes.add_type('text/html', '.php')
     socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         socket_servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -196,8 +255,6 @@ def servidor(direccion):
         signal.signal(signal.SIGCHLD, guarderia)
 
         while True:
-            print('--------------------')
-            print('Esperando conexión...')
             try:
                 socket_cliente, direccion_cliente = socket_servidor.accept()
 
@@ -212,15 +269,14 @@ def servidor(direccion):
 
             # Forkeo el proceso: El hijo  se encarga de atender al cliente
             pid = os.fork()
-            if pid == 0:  # Proceso hijo:
+            if pid == 0:
                 servidor_hijo(socket_servidor, socket_cliente)
 
-            else:  # Proceso padre:
+            else:
                 socket_cliente.close()
 
-                print('--------------------')
                 print('Conexión establecida: ' +
-                      '<{}:{}> con subproceso <{}>\n'.format(
+                      '<{}:{}> con subproceso <{}>'.format(
                           direccion_cliente[0],
                           direccion_cliente[1],
                           pid))
@@ -230,25 +286,6 @@ def servidor(direccion):
 
     finally:
         socket_servidor.close()
-
-
-# noinspection PyProtectedMember
-def servidor_hijo(socket_servidor, socket_cliente):
-    socket_servidor.close()
-
-    try:
-        # Recibe pedido y responde:
-        headers, cuerpo = recibir_http_request(socket_cliente)
-        paquete = buscar_recurso(headers, cuerpo)
-        enviar(socket_cliente, paquete)
-
-    except ConexionTerminadaExcepcion:
-        print('Conexión terminada')
-
-    finally:
-        print('Cerrando hijo...')
-        socket_cliente.close()
-        os._exit(0)
 
 
 if __name__ == '__main__':
