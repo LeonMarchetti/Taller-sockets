@@ -137,7 +137,7 @@ def ejecutar_php(script):
     p = subprocess.Popen('php ' + script,
                          shell=True,
                          stdout=subprocess.PIPE)
-    return p.stdout.read() + p.stderr.read()
+    return p.stdout.read()
 
 
 def verificar_aceptacion_tipo(accept, tipo_mime):
@@ -198,10 +198,7 @@ def buscar_recurso(headers_pedido, cuerpo_pedido):
             # Abro el archivo del recurso. Si es un script PHP entonces lo
             # ejecuto:
             if os.path.splitext(archivo)[1] == '.php':
-                p = subprocess.Popen('php ' + archivo,
-                                     shell=True,
-                                     stdout=subprocess.PIPE)
-                cuerpo = p.stdout.read()
+                cuerpo = ejecutar_php(archivo)
 
             else:
                 cuerpo = b''
