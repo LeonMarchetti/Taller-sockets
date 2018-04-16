@@ -32,9 +32,9 @@ class ServidorFork:
     def __init__(self, direccion, proceso):
         """
         Inicia el servidor.
-        :param direccion: Par dirección IP y número de puerto que usará el \
+        :param direccion: Par dirección IP y número de puerto que usará el
         servidor.
-        :param proceso: Función que acepta un objeto socket y devuelva los \
+        :param proceso: Función que acepta un objeto socket y devuelva los
         datos a enviar por tal socket.
         """
         socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
