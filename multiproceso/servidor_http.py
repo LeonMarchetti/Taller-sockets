@@ -70,12 +70,10 @@ def parsear_header_request(header_completo):
     # Parseo el pedido:
     request_line_match = re.match('^(GET|POST|HEAD) \/(.*) HTTP\/\d\.\d$',
                                   request_line)
-    request_method = request_line_match.group(1)
-    request_uri = request_line_match.group(2)
 
     # Diccionario con los encabezados
-    headers_dict = {'Request-Method': request_method}
-    headers_dict['Request-URI'] = request_uri
+    headers_dict = {'Request-Method': request_line_match.group(1),
+                    'Request-URI': request_line_match.group(2)}
 
     # Armo el diccionario con los encabezados:
     for linea in lista_headers:
@@ -151,6 +149,7 @@ def verificar_aceptacion_tipo(accept, tipo_mime):
 
     return False
 
+
 # noinspection PyUnusedLocal
 def buscar_recurso(headers_pedido, cuerpo_pedido):
 
@@ -196,7 +195,8 @@ def buscar_recurso(headers_pedido, cuerpo_pedido):
             cuerpo = b''
 
         else:
-            # Abro el archivo del recurso. Si es un script PHP entonces lo ejecuto:
+            # Abro el archivo del recurso. Si es un script PHP entonces lo
+            # ejecuto:
             if os.path.splitext(archivo)[1] == '.php':
                 p = subprocess.Popen('php ' + archivo,
                                      shell=True,
