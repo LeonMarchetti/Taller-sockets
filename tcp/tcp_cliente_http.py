@@ -1,8 +1,9 @@
 # _*_ coding: utf-8 _*_
 """
 Parámetros:
-* -c Carpeta donde guardar la página y sus recursos asociados.
-* -u URL de la página a solicitar
+* -d <dir> Directorio donde guardar la página y sus recursos asociados.
+* -p Indica si se usa proxy.
+* -u <url> URL de la página a solicitar
 """
 import getopt
 import os
@@ -13,21 +14,41 @@ import sys
 from urllib.parse import urlparse
 
 
-# PROXY = ('89.236.17.108', 3128)
-PROXY = ('183.179.199.225', 8080)
+PROXY = ('183.179.199.225', 8080)  # Hong Kong (Kwun Tong)
 
 
 class ConexionTerminadaExcepcion(Exception):
     pass
 
 
-def enviar(s, datos):
-    while datos:
-        enviado = s.send(datos)
-        if not enviado:
-            raise ConexionTerminadaExcepcion
+def parsear_url(_url):
+    """Formatea un string url, para obtener el host absoluto, host y el
+    recurso a acceder. El host absoluto es el string que incluye el esquema y
+    el host a acceder, por ejemplo "http://www.ejemplo.com" que se antepone en
+    el uri de un pedido HTTP con proxy de por medio.
+    """
+    if not re.match(r'^https?:\/\/', _url):
+        _url = 'http://' + _url
 
-        datos = datos[enviado:]
+    obj_url = urlparse(_url)
+    absolute_host = obj_url.scheme + '://' + obj_url.netloc
+    host = obj_url.netloc
+
+    pagina = obj_url.path
+    if pagina == '':
+        pagina = '/'
+
+    return absolute_host, host, pagina
+
+
+def loggear_header(titulo, linea_estado, headers):
+    log = '[{0}]\r\n{1}\r\n'.format(titulo, linea_estado)
+    for k in headers:
+        log += '{}: {}\r\n'.format(k, headers[k])
+    log += '\r\n'
+
+    with open('log.txt', 'a') as archivo:
+        archivo.write(log)
 
 
 def parsear_header(header):
@@ -36,7 +57,6 @@ def parsear_header(header):
     # Separo la línea estado y obtengo el código de estado:
     linea_estado = header_lineas.pop(0).decode('ISO-8859-1')
     print(linea_estado)
-    codigo = int(re.match(r'^HTTP/\d\.\d (\d{3}) [\w ]+$', linea_estado)[1])
 
     # Armo el diccionario con los encabezados:
     headers_dict = {}
@@ -45,7 +65,7 @@ def parsear_header(header):
         n = linea_str.find(': ')
         headers_dict[linea_str[:n]] = linea_str[n + 2:]
 
-    return codigo, headers_dict
+    return linea_estado, headers_dict
 
 
 def recibir_http(s):
@@ -62,7 +82,7 @@ def recibir_http(s):
             raise ConexionTerminadaExcepcion
 
     # Proceso el header:
-    codigo, headers = parsear_header(cachos[:f])
+    linea_estado, headers = parsear_header(cachos[:f])
     cachos = cachos[f + 4:]
 
     # Ahora recibo el cuerpo:
@@ -86,7 +106,7 @@ def recibir_http(s):
                 break
 
     # Regreso el código de estado, los encabezados y el cuerpo:
-    return codigo, headers, cachos
+    return linea_estado, headers, cachos
 
 
 def get(absolute_host, host, recurso, _proxy=False):
@@ -106,40 +126,21 @@ def get(absolute_host, host, recurso, _proxy=False):
         'Host: {}\r\n'.format(host),
     )
     print(lineas[0].replace('\r\n', ''))
-    pedido = ''.join(lineas) + '\r\n'
+    pedido = '{}\r\n'.format(''.join(lineas))
 
     # Abro la conexión con el servidor y envío el pedido:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as servidor:
-        servidor.connect(direccion)
-        enviar(servidor, pedido.encode())
-        return recibir_http(servidor)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_servidor:
+        socket_servidor.connect(direccion)
+        socket_servidor.sendall(pedido.encode())
+        return recibir_http(socket_servidor)
 
 
-def parsear_url(_url):
-    """Formatea un string url, para obtener el host absoluto, host y el
-    recurso a acceder. El host absoluto es el string que incluye el esquema y
-    el host a acceder, por ejemplo "http://www.ejemplo.com" que se antepone en
-    el uri de un pedido HTTP con proxy de por medio.
-    """
-    if not re.match(r'^https?:\/\/', _url):
-        _url = 'http://' + _url
-
-    obj_url = urlparse(_url)
-    absolute_host = obj_url.scheme + '://' + obj_url.netloc
-    host = obj_url.netloc
-
-    pagina = obj_url.path
-    if pagina == '':
-        pagina = '/'
-
-    return absolute_host, host, pagina
-
-
-def loggear_header(header, titulo):
-    str_header = header.decode('ISO-8859-1').replace('\r\n', '\n') + '\r\n'
-    log = '[{0}]\n{1}'.format(titulo, str_header)
-    with open('paginas/log.txt', 'a') as archivo:
-        archivo.write(log)
+def get_codigo(linea_estado):
+    codigo_match = re.match(r'^HTTP/\d\.\d (\d{3}) [\w ]+$', linea_estado)
+    if codigo_match:
+        return int(codigo_match.group(1))
+    else:
+        raise RuntimeError('No hubo match de código...')
 
 
 def guardar(_carpeta, nombre_archivo, datos):
@@ -164,15 +165,28 @@ def crear_carpeta(nombre_carpeta):
     return nombre_carpeta
 
 
+def get_codificacion(headers):
+    encoding = 'ISO-8859-1'
+    if 'Content-Type' in headers:
+        content_type_match = re.search(r'charset=(.*)', headers['Content-Type'])
+        if content_type_match:
+            encoding = content_type_match.group(1)
+
+    return encoding
+
+
 def buscar(_carpeta, _url, _proxy):
     while True:
         absolute_host, host, pagina = parsear_url(_url)
-
         # Armo y envío el pedido al servidor, y obtengo la respuesta:
         try:
-            estado, headers, cuerpo = get(absolute_host, host, pagina, _proxy)
+            linea_estado, headers, cuerpo = get(absolute_host,
+                                                host,
+                                                pagina,
+                                                _proxy)
+            loggear_header('{}{}'.format(host, pagina), linea_estado, headers)
 
-        except ConnectionRefusedError:
+        except ConexionTerminadaExcepcion:
             print('Conexión rechazada...')
             return
 
@@ -181,30 +195,21 @@ def buscar(_carpeta, _url, _proxy):
             return
 
         else:  # Control de redirección
-            if estado in (301, 302):
+            if get_codigo(linea_estado) in (301, 302):
                 # Si obtengo un mensaje de redirección, obtengo el nuevo
                 # destino y busco de vuelta
                 if 'Location' in headers:
                     _url = headers['Location']
-
+                    continue
                 else:
-                    print('Destino de redirección no encontrado...')
-                    return
-
-                continue
+                    raise RuntimeError('Destino de redirección no '
+                                       'encontrado...')
 
             else:
                 break
 
     # Decodifico el contenido:
-    encoding = 'ISO-8859-1'
-    if 'Content-Type' in headers:
-        match_content_type = re.search(r'charset=(.*)',
-                                       headers['Content-Type'])
-        if match_content_type:
-            encoding = match_content_type.group(1)
-
-    contenido = cuerpo.decode(encoding)
+    contenido = cuerpo.decode(get_codificacion(headers))
 
     # Busco el título de la página:
     titulo_search = re.search(r'<title>\s*(.*)\s*</title>', contenido)
@@ -216,11 +221,9 @@ def buscar(_carpeta, _url, _proxy):
     titulo = titulo.strip().replace(' ', '_').replace(':', '_')
 
     # Creo la carpeta donde guardar la página:
-
     _carpeta += titulo
     _carpeta = crear_carpeta(_carpeta)
-    print('Carpeta: "{}"'.format(_carpeta))
-    guardar(_carpeta, titulo + '.html', cuerpo)
+    guardar(_carpeta, '{}.html'.format(titulo), cuerpo)
 
     # Busco las referencias externas en el html:
     pattern = re.compile(r'(?:href|src)=\"([\w/-]*\.(\w*))\"')
@@ -228,14 +231,17 @@ def buscar(_carpeta, _url, _proxy):
         if ext not in 'html':
             # Hago un GET de todos los recursos, salvo los html:
             try:
-                codigo, headers, cuerpo = get(absolute_host,
-                                              host,
-                                              '/' + nombre_archivo,
-                                              _proxy)
+                linea_estado, headers, cuerpo = get(absolute_host,
+                                                    host,
+                                                    '/' + nombre_archivo,
+                                                    _proxy)
+                loggear_header('{}/{}'.format(host, nombre_archivo),
+                               linea_estado,
+                               headers)
                 if cuerpo:
                     guardar(_carpeta, nombre_archivo, cuerpo)
 
-            except ConnectionRefusedError:
+            except ConexionTerminadaExcepcion:
                 print('Conexión rechazada...')
                 break
 
@@ -247,7 +253,7 @@ def buscar(_carpeta, _url, _proxy):
 if __name__ == '__main__':
     # Parámetros de la línea de comandos:
     try:
-        opts, _ = getopt.getopt(sys.argv[1:], 'c:u:p')
+        opts, _ = getopt.getopt(sys.argv[1:], 'd:u:p')
     except getopt.GetoptError as error:
         print('Error con el parámetro {0.opt}: {0.msg}'.format(error))
     else:
@@ -256,7 +262,7 @@ if __name__ == '__main__':
         url = ''
 
         for opt, arg in opts:
-            if opt == '-c':  # Carpeta
+            if opt == '-d':  # Carpeta
                 carpeta = arg
                 if carpeta[-1] not in '/\\':
                     carpeta += '/'
