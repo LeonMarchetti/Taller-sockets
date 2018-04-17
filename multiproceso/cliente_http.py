@@ -1,10 +1,9 @@
-﻿# coding=utf-8
+﻿# -*- coding=utf-8 -*-
 """
 Parámetros:
 * -d Directorio donde guardar la página y sus recursos asociados.
 * -u URL de la página a solicitar
 """
-
 import getopt
 import os
 import os.path
@@ -15,9 +14,7 @@ import socket
 import sys
 
 
-BUFFER = 1024
-
-
+# noinspection PyUnresolvedReferences,PyUnusedLocal
 def guarderia(signum, frame):
     """When a child process exits, the kernel sends a SIGCHLD signal. The
     parent process can set up a signal handler to be asynchronously notified of
@@ -35,11 +32,11 @@ def guarderia(signum, frame):
             return
 
 
-def parsear_url(url):
-    if not re.match(r'^https?:\/\/', url):
-        url = 'http://' + url
+def parsear_url(_url):
+    if not re.match(r'^https?:\/\/', _url):
+        _url = 'http://' + _url
 
-    o = urllib.parse.urlparse(url)
+    o = urllib.parse.urlparse(_url)
 
     pagina = o.path
     if pagina == '':
@@ -59,7 +56,7 @@ def recibir_http(s):
     datos = b''
     while True:
         # Recibo datos del stream
-        cacho = s.recv(BUFFER)
+        cacho = s.recv(1024)
         if not cacho:
             return datos
 
@@ -84,7 +81,7 @@ def recibir_http(s):
                         break
 
 
-def GET(host, recurso):
+def get(host, recurso):
     # Armo el pedido:
     get_linea = 'GET {} HTTP/1.1\r\n'.format(recurso)
     print(get_linea.strip())
@@ -146,11 +143,11 @@ def crear_carpeta(nombre_carpeta):
     return nombre_carpeta
 
 
-def guardar(carpeta, nombre_archivo, datos):
+def guardar(_carpeta, nombre_archivo, datos):
     # Extraigo la barra de directorio del nombre del archivo, si lo tuviera:
     try:
         match = re.match(r'\/?(.*)', nombre_archivo)
-        path_archivo = os.path.join(carpeta, match.group(1))
+        path_archivo = os.path.join(_carpeta, match.group(1))
 
         os.makedirs(os.path.dirname(path_archivo), exist_ok=True)
 
@@ -169,20 +166,21 @@ def buscar_titulo(html):
         return ''
 
 
-def recuperar(url, carpeta):
+# noinspection PyProtectedMember
+def recuperar(_url, _carpeta):
     # Primero pido la página principal
     # Realizo el pedido hasta que no me siga redirigiendo:
     while True:
-        host, pagina = parsear_url(url)
+        host, pagina = parsear_url(_url)
 
         # Armo y envío el pedido al servidor, y obtengo la respuesta:
         try:
-            http_resp, estado = GET(host, pagina)
+            http_resp, estado = get(host, pagina)
             if estado in (302,):
                 # Si obtengo un mensaje de redirección, obtengo el nuevo
                 # destino y busco de vuelta
                 http_header, _ = parsear_http(http_resp)
-                url = buscar_redireccion(http_header.decode('ISO-8859-1'))
+                _url = buscar_redireccion(http_header.decode('ISO-8859-1'))
                 continue
             else:
                 break
@@ -196,12 +194,13 @@ def recuperar(url, carpeta):
 
     # Separo header del cuerpo:
     http_header, http_body = parsear_http(http_resp)
-    loggear_header(http_header, url)
+    loggear_header(http_header, _url)
     html = http_body.decode('ISO-8859-1')
 
     # Creo la carpeta donde guardar la página:
-    # Puede cambiar el nombre de la carpeta para no sobreescribir una página ya existente.
-    carpeta = crear_carpeta(carpeta)
+    # Puede cambiar el nombre de la carpeta para no sobreescribir una página
+    # ya existente.
+    _carpeta = crear_carpeta(_carpeta)
 
     # Guardo el archivo:
     if pagina in ('', '/'):
@@ -210,11 +209,11 @@ def recuperar(url, carpeta):
         if titulo:
             archivo = titulo.replace(' ', '_') + '.html'
         else:
-            archivo = url.replace('.', '_dot_') + '.html'
+            archivo = _url.replace('.', '_dot_') + '.html'
     else:
         archivo = pagina
 
-    guardar(carpeta, archivo, http_body)
+    guardar(_carpeta, archivo, http_body)
 
     signal.signal(signal.SIGCHLD, guarderia)
 
@@ -227,10 +226,10 @@ def recuperar(url, carpeta):
             if pid == 0:
                 # Proceso hijo:
                 try:
-                    resp, _ = GET(host, '/' + nombre_archivo)
+                    resp, _ = get(host, '/' + nombre_archivo)
                     header, body = parsear_http(resp)
                     if body:
-                        guardar(carpeta, nombre_archivo, body)
+                        guardar(_carpeta, nombre_archivo, body)
 
                 except ConnectionRefusedError:
                     print('Conexión rechazada...')
@@ -244,29 +243,27 @@ def recuperar(url, carpeta):
                 print('Forkeado a proceso: {}'.format(pid))
 
 
-def main(argv):
+if __name__ == '__main__':
+    # Parámetros de la línea de comandos:
     try:
-        # Parámetros de la línea de comandos:
-        opts, _ = getopt.getopt(argv[1:], 'd:u:')
-
-        carpeta = ''
+        opts, _ = getopt.getopt(sys.argv[1:], 'c:u:')
+    except getopt.GetoptError as error:
+        print('Error con el parámetro {0.opt}: {0.msg}'.format(error))
+    else:
+        carpeta = 'paginas/'
+        proxy = False
         url = ''
 
         for opt, arg in opts:
-            if opt == '-d':  # Directorio/Carpeta
+            if opt == '-c':  # Carpeta
                 carpeta = arg
+                if carpeta[-1] not in '/\\':
+                    carpeta += '/'
+
             elif opt == '-u':  # URL
                 url = arg
 
         if url:
-            if carpeta:
-                recuperar(url, carpeta)
-            else:
-                recuperar(url, 'paginas')
-
-    except getopt.GetoptError:
-        print('Error con los parámetros: ' + str(argv))
-
-
-if __name__ == '__main__':
-    main(sys.argv)
+            recuperar(url, carpeta)
+        else:
+            print('Falta indicar la URL.')
