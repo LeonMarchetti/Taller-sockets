@@ -23,12 +23,6 @@ class ConexionTerminadaExcepcion(Exception):
     pass
 
 
-def enviar(s, datos):
-    while datos:
-        enviado = s.send(datos)
-        datos = datos[enviado:]
-
-
 def recibir(s):
     cachos = b''
     while True:
@@ -54,7 +48,7 @@ def iniciar_servidor(direccion):
     sqlite_conexion = sqlite3.connect('acs-1-year-2015.sqlite')
     sqlite_cursor = sqlite_conexion.cursor()
 
-    select_server.servidor(direccion, procesar_query)
+    select_server.SelectServer(direccion, procesar_query)
 
 
 def procesar_query(datos):
@@ -65,23 +59,24 @@ def procesar_query(datos):
             sqlite_cursor.execute(sql)
             resultado = sqlite_cursor.fetchall()
             if resultado:
-                mensaje = json.dumps(resultado).encode()
+                mensaje = json.dumps(resultado)
 
             else:
-                mensaje = 'Esta consulta no regresó resultados.'.encode()
+                mensaje = 'Esta consulta no regresó resultados.'
 
         except sqlite3.Error as e:
-            mensaje = e.args[0].encode()
+            mensaje = e.args[0]
             print('Error: {}'.format(mensaje))
 
         else:
             print('OK')
 
     else:
-        mensaje = 'La/s sentencias sql no están completas.'.encode()
+        mensaje = 'La/s sentencias sql no están completas.'
         print('Error: {}'.format(mensaje))
 
-    return len(mensaje).to_bytes(4, byteorder='big') + mensaje
+    salida = mensaje.encode()
+    return len(salida).to_bytes(4, byteorder='big') + salida
 
 
 # Cliente ====================================================================
