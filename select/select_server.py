@@ -39,14 +39,7 @@ class SelectServer:
             self._handle_exceptional(exceptional)
 
     def _handle_inputs(self, readable):
-        """The “readable” sockets represent three possible cases. If the
-        socket is the main “server” socket, the one being used to listen for
-        connections, then the “readable” condition means it is ready to
-        accept another incoming connection. In addition to adding the new
-        connection to the list of inputs to monitor, this section sets the
-        client socket to not block. """
         for readable_socket in readable:
-
             if readable_socket is self.server:
                 # A "readable" socket is ready to accept a connection
                 connection, client_address = readable_socket.accept()
