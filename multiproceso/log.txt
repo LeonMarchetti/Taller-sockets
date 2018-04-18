@@ -1,291 +1,164 @@
-[www.unlu.edu.ar/institucional.html]
+[www.unlu.edu.ar/grado.html]
 HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 15:50:17 GMT
+Content-Type: text/html; charset=iso-8859-1
+Transfer-Encoding: chunked
+Vary: Accept-Encoding
 Server: Apache/2.4.10 (Debian)
+Connection: close
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/css/impresion-v2.css]
+HTTP/1.1 200 OK
+Content-Type: text/css
+ETag: "1af5-5559d5319af53"
 Vary: Accept-Encoding
 Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 15:53:49 GMT
 Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 15:56:14 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 15:58:22 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 15:59:33 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:01:27 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:04:53 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:06:14 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:07:09 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:08:05 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:08:51 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:10:41 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:11:19 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:16:23 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:18:03 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:19:05 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:21:45 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:22:17 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:23:28 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:39:11 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:41:59 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:42:54 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:43:38 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:48:59 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:49:40 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:54:08 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:54:33 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 16:59:55 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 17:00:11 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.scintilla.org/SciTEDoc.html]
-HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 17:06:11 GMT
-Server: Apache/2.0.52 (Red Hat)
+Last-Modified: Mon, 31 Jul 2017 13:51:15 GMT
 Accept-Ranges: bytes
-Vary: Accept-Encoding
-Cache-Control: max-age=0
-Expires: Wed, 14 Mar 2018 17:06:11 GMT
-Content-Length: 215572
-Connection: close
-Content-Type: text/html
-[www.unlu.edu.ar/institucional.html]
+Content-Length: 6901
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/css/texto-v3-1.css]
 HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 17:11:56 GMT
-Server: Apache/2.4.10 (Debian)
+Content-Type: text/css
+ETag: "30ab-54c5699c0c880"
 Vary: Accept-Encoding
 Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
+Server: Apache/2.4.10 (Debian)
+Last-Modified: Tue, 04 Apr 2017 12:41:54 GMT
+Accept-Ranges: bytes
+Content-Length: 12459
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/css/general-v4-3.css]
 HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 17:17:07 GMT
-Server: Apache/2.4.10 (Debian)
+Content-Type: text/css
+ETag: "4f42-567d8c415fae1"
 Vary: Accept-Encoding
 Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
+Server: Apache/2.4.10 (Debian)
+Last-Modified: Tue, 20 Mar 2018 14:19:43 GMT
+Accept-Ranges: bytes
+Content-Length: 20290
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/imagenes/transparente.gif]
 HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 17:20:00 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
+Content-Type: image/gif
+ETag: "6f-44d5d1e26d000"
 Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
+Server: Apache/2.4.10 (Debian)
+Last-Modified: Fri, 16 May 2008 18:24:00 GMT
+Accept-Ranges: bytes
+Content-Length: 111
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/imagenes/transparente.gif]
 HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 17:20:44 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
+Content-Type: image/gif
+ETag: "6f-44d5d1e26d000"
 Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
+Server: Apache/2.4.10 (Debian)
+Last-Modified: Fri, 16 May 2008 18:24:00 GMT
+Accept-Ranges: bytes
+Content-Length: 111
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/index.php]
 HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 17:22:05 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
-Connection: close
-Transfer-Encoding: chunked
 Content-Type: text/html; charset=iso-8859-1
-[www.unlu.edu.ar/institucional.html]
+Transfer-Encoding: chunked
+Vary: Accept-Encoding
+Server: Apache/2.4.10 (Debian)
+Connection: close
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/imagenes/logounlu-nombre6-sitio-b.png]
 HTTP/1.1 200 OK
-Date: Wed, 14 Mar 2018 17:29:38 GMT
-Server: Apache/2.4.10 (Debian)
-Vary: Accept-Encoding
+Content-Type: image/png
+ETag: "37c2-4e56622cb0d00"
 Connection: close
-Transfer-Encoding: chunked
-Content-Type: text/html; charset=iso-8859-1
+Server: Apache/2.4.10 (Debian)
+Last-Modified: Mon, 02 Sep 2013 12:59:00 GMT
+Accept-Ranges: bytes
+Content-Length: 14274
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/imagenes/boton-buscar2.gif]
+HTTP/1.1 200 OK
+Content-Type: image/gif
+ETag: "35c-44d5d1a934900"
+Connection: close
+Server: Apache/2.4.10 (Debian)
+Last-Modified: Fri, 16 May 2008 18:23:00 GMT
+Accept-Ranges: bytes
+Content-Length: 860
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/imagenes/youtube-nuevo.png]
+HTTP/1.1 200 OK
+Content-Type: image/png
+ETag: "4f0-517b4b8785800"
+Connection: close
+Server: Apache/2.4.10 (Debian)
+Last-Modified: Thu, 04 Jun 2015 17:44:00 GMT
+Accept-Ranges: bytes
+Content-Length: 1264
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/imagenes/twitter-nuevo.png]
+HTTP/1.1 200 OK
+Content-Type: image/png
+ETag: "23c-517af50734300"
+Connection: close
+Server: Apache/2.4.10 (Debian)
+Last-Modified: Thu, 04 Jun 2015 11:17:00 GMT
+Accept-Ranges: bytes
+Content-Length: 572
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/imagenes/mapa-sitio2.gif]
+HTTP/1.1 200 OK
+Content-Type: image/gif
+ETag: "73-486cad9a7a100"
+Connection: close
+Server: Apache/2.4.10 (Debian)
+Last-Modified: Mon, 17 May 2010 14:15:00 GMT
+Accept-Ranges: bytes
+Content-Length: 115
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/imagenes/rss.gif]
+HTTP/1.1 200 OK
+Content-Type: image/gif
+ETag: "62e-466a9acb6a600"
+Connection: close
+Server: Apache/2.4.10 (Debian)
+Last-Modified: Fri, 03 Apr 2009 17:14:00 GMT
+Accept-Ranges: bytes
+Content-Length: 1582
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/imagenes/facebook-nuevo.png]
+HTTP/1.1 200 OK
+Content-Type: image/png
+ETag: "25b-517af50734300"
+Connection: close
+Server: Apache/2.4.10 (Debian)
+Last-Modified: Thu, 04 Jun 2015 11:17:00 GMT
+Accept-Ranges: bytes
+Content-Length: 603
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+
+[www.unlu.edu.ar/imagenes/rss-nuevo.png]
+HTTP/1.1 200 OK
+Content-Type: image/png
+ETag: "3d2-517af50734300"
+Connection: close
+Server: Apache/2.4.10 (Debian)
+Last-Modified: Thu, 04 Jun 2015 11:17:00 GMT
+Accept-Ranges: bytes
+Content-Length: 978
+Date: Tue, 17 Apr 2018 18:58:46 GMT
+

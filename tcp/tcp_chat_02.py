@@ -18,17 +18,6 @@ class ConexionTerminadaExcepcion(Exception):
     pass
 
 
-def enviar(s, mensaje):
-    paquete = mensaje + TOKEN
-
-    while paquete:
-        enviado = s.send(paquete)
-        if enviado == 0:
-            raise ConexionTerminadaExcepcion
-
-        paquete = paquete[enviado:]
-
-
 def recibir(s):
     paquetes = []
     cachos = b''
@@ -65,32 +54,36 @@ def servidor(direccion):
         socket_servidor.listen(5)
         print('Escuchando en <{}:{}>'.format(direccion[0], direccion[1]))
 
-        while True:  # Ciclo que acepta las conexiones (un cliente a la vez)
-            print('--------------------')
-            print('Esperando conexión...')
-            socket_cliente, direccion = socket_servidor.accept()
-            print('--------------------')
-            print('Conexión establecida: <{}:{}>\n'.format(direccion[0],
-                                                           direccion[1]))
-            try:
-                while True:
-                    # Recibir mensaje/s:
-                    procesar(recibir(socket_cliente))
+        try:
+            while True:  # Ciclo que acepta las conexiones (un cliente a la vez)
+                print('--------------------')
+                print('Esperando conexión...')
+                socket_cliente, direccion = socket_servidor.accept()
+                print('--------------------')
+                print('Conexión establecida: <{}:{}>\n'.format(direccion[0],
+                                                               direccion[1]))
+                try:
+                    while True:
+                        # Recibir mensaje/s:
+                        procesar(recibir(socket_cliente))
 
-                    # Enviar mensaje:
-                    mensaje = input('> ')
-                    if mensaje:
-                        enviar(socket_cliente, mensaje.encode())
+                        # Enviar mensaje:
+                        mensaje = input('> ')
+                        if mensaje:
+                            socket_cliente.sendall(mensaje.encode() + TOKEN)
 
-                    else:  # Cortar el chat si se ingresa un mensaje vacio.
-                        print('Chat terminado')
-                        break
+                        else:  # Cortar el chat si se ingresa un mensaje vacio.
+                            print('Chat terminado')
+                            break
 
-            except ConexionTerminadaExcepcion:
-                print('Chat terminado')
+                except ConexionTerminadaExcepcion:
+                    print('Chat terminado')
 
-            finally:
-                socket_cliente.close()
+                finally:
+                    socket_cliente.close()
+
+        except KeyboardInterrupt:
+            print(' Servidor terminado...')
 
 
 def cliente(direccion):
@@ -101,7 +94,7 @@ def cliente(direccion):
                 # Enviar mensaje:
                 mensaje = input('> ')
                 if mensaje:
-                    enviar(socket_servidor, mensaje.encode())
+                    socket_servidor.sendall(mensaje.encode() + TOKEN)
 
                 else:  # Cortar el chat si se ingresa un mensaje vacio.
                     print('Chat terminado')
