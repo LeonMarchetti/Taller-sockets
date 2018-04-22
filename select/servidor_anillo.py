@@ -6,7 +6,6 @@ Parámetros:
 """
 import binascii
 import getopt
-import os
 import random
 from select_server import SelectServer
 import socket
@@ -19,18 +18,26 @@ class ServidorAnillo:
 
     def __init__(self, direccion):
         self.id = 0
-        self.nodos = []  # Lista de tuplas (id, ip)
+        self.nodos = [(self.id, direccion[0])]  # Lista de tuplas (id, ip)
         SelectServer((direccion[0], ServidorAnillo.puerto), self._proceso)
 
     def _proceso(self, direccion, datos):
         if datos == b'CON':
-            nuevo_id = random.randint(1, 254)
-            print(f'id: {nuevo_id}')
-            print(f'ip: {direccion[0]}')
+            # Generación de id único para el nuevo nodo:
+            while True:
+                nuevo_id = random.randint(1, 254)
+                esta = False
+                for nodo in self.nodos:
+                    if nodo[0] == nuevo_id:
+                        esta = True
+                        break
+                if not esta:
+                    break
+
+            print('>>> Datos:\nid\t{}\nip\t{}'.format(nuevo_id, direccion[0]))
             nuevo_nodo = (nuevo_id, direccion[0])
 
             cantidad = len(self.nodos)
-            print(f'cantidad: {cantidad}')
             nuevo_pos = len(self.nodos)
 
             lista_nodos = b''
@@ -43,7 +50,6 @@ class ServidorAnillo:
                 if nodo[0] > nuevo_nodo[0] and nuevo_pos > i:
                     nuevo_pos = i
 
-            print(f'pos: {nuevo_pos}')
             self.nodos.insert(nuevo_pos, nuevo_nodo)
 
             confirmacion = (nuevo_id.to_bytes(1, byteorder='big') +
@@ -52,8 +58,16 @@ class ServidorAnillo:
                             b' ' +
                             lista_nodos)
 
-            print('Enviando confirmacion:\n{}\n'.format(
-                binascii.hexlify(confirmacion)))
+            print('>>> Confirmacion:\n{}'.format(
+                binascii.hexlify(confirmacion).decode()))
+
+            print('>>> Nodos:\ni\tid\tip')
+            i = 0
+            for nodo in self.nodos:
+                print('{}\t{}\t{}'.format(i, *nodo))
+                i += 1
+
+            print('')
 
             return confirmacion
         else:

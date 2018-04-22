@@ -37,7 +37,6 @@ class NodoAnillo:
                 print('Error: Conexión rechazada.')
                 return
 
-        print('Conectado')
         self._procesar_confirmacion(paquete)
         # SelectServer((self.direccion, NodoAnillo.puerto),
         #              self._procesar_token)
@@ -47,15 +46,27 @@ class NodoAnillo:
         cant_nodos = int.from_bytes(datos[1:2], byteorder='big')
         self.pos = int.from_bytes(datos[2:3], byteorder='big')
 
-        print(f'Info nodo:\nid: {self.id}\npos: {self.pos}\n'
-              f'total nodos: {cant_nodos}\n')
+        print('>>> Datos\nid\t{0}\npos\t{1}'.format(self.id, self.pos))
 
+        # Lleno la lista de nodos:
+        # * En esta lista (propia del nodo) no se incluye al propio nodo.
+        print('>>> Nodos:\ni\tid\tip')
         for i in range(cant_nodos):
             offset = 4 + 5 * i
             id_nodo = int.from_bytes(datos[offset:offset + 1], byteorder='big')
             ip_nodo = socket.inet_ntoa(datos[offset + 1:offset + 5])
-            print(f'[{id_nodo}:{ip_nodo}]')
+            print('[{0}]\t{1}\t{2}'.format(i, id_nodo, ip_nodo))
             self.nodos.append((id_nodo, ip_nodo))
+
+        # Determino quienes son los nodos vecinos:
+        print('>>> Vecinos:\n\ti\tid\tip')
+        self.nodo_izq = (self.pos - 1) % len(self.nodos)
+        self.nodo_der = self.pos % len(self.nodos)
+
+        print('Izq\t{}\t{}\t{}'.format(self.nodo_izq, *self.nodos[
+            self.nodo_izq]))
+        print('Der\t{}\t{}\t{}'.format(self.nodo_der, *self.nodos[
+            self.nodo_der]))
 
     @staticmethod
     def _recibir_confirmacion(s):
@@ -67,7 +78,7 @@ class NodoAnillo:
                 cachos += cacho
                 if not longitud:
                     if len(cachos) >= 4:
-                        longitud = 4 + 8 * int.from_bytes(cachos[8:16],
+                        longitud = 4 + 5 * int.from_bytes(cachos[1:2],
                                                           byteorder='big')
                     else:
                         continue
@@ -101,7 +112,7 @@ if __name__ == '__main__':
     else:
         # Parámetros por defecto para host y puerto:
         host = 'localhost'
-        port = 10000
+        port = 8025
 
         for opt, arg in opts:
             if opt == '-i':  # Dirección IP
