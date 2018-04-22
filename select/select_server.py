@@ -85,10 +85,10 @@ class SelectServer:
             # except KeyError:
             #     pass
             else:
-                # Ejecución de la función pasada por parámetro, que recibe
-                # los datos recibidos como entrada y devuelve los datos a
-                # enviar como resultado.
-                salida = proceso(next_msg)
+                # Ejecución de la función pasada por parámetro, que recibe la
+                # direccion del socket remoto y los datos recibidos como
+                # entrada y devuelve los datos a enviar como resultado.
+                salida = proceso(writable_socket.getpeername(), next_msg)
                 writable_socket.send(salida)
 
     def _handle_exceptional(self, exceptional):

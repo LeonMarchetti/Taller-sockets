@@ -51,7 +51,8 @@ def iniciar_servidor(direccion):
     select_server.SelectServer(direccion, procesar_query)
 
 
-def procesar_query(datos):
+def procesar_query(direccion, datos):
+    print(f'Recibido de: <{direccion[0]}:{direccion[1]}>')
     sql = datos.decode().strip()
     print('Query: {}'.format(sql))
     if sqlite3.complete_statement(sql):
