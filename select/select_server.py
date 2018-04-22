@@ -82,8 +82,8 @@ class SelectServer:
             except queue.Empty:
                 # No messages waiting so stop checking for writability.
                 self.outputs.remove(writable_socket)
-            # except KeyError:
-            #     pass
+            except KeyError:
+                pass
             else:
                 # Ejecución de la función pasada por parámetro, que recibe la
                 # direccion del socket remoto y los datos recibidos como
