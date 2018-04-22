@@ -6,6 +6,7 @@ Parámetros:
 """
 import getopt
 import os
+from select_server import SelectServer
 import socket
 import sys
 
@@ -17,6 +18,7 @@ class ConexionTerminadaExcepcion(Exception):
 class NodoAnillo:
     # Número de puerto de los nodos reservado para el anillo.
     puerto = 8025
+    id_bcast = (255).to_bytes(1, byteorder='big')
 
     def __init__(self, servidor_addr):
         # Lista de los nodos en la topología. Cada nodo lo representa una
@@ -35,9 +37,10 @@ class NodoAnillo:
                 print('Error: Conexión rechazada.')
                 return
 
+        print('Conectado')
         self._procesar_confirmacion(paquete)
-
-        # =====================================================================
+        # SelectServer((self.direccion, NodoAnillo.puerto),
+        #              self._procesar_token)
 
     def _procesar_confirmacion(self, datos):
         self.id = int.from_bytes(datos[:1], byteorder='big')
@@ -49,10 +52,10 @@ class NodoAnillo:
 
         for i in range(cant_nodos):
             offset = 4 + 5 * i
-            self.nodos.append((
-                int.from_bytes(datos[offset:offset + 1], byteorder='big'),
-                socket.inet_ntoa(datos[offset + 1:offset + 5])
-            ))
+            id_nodo = int.from_bytes(datos[offset:offset + 1], byteorder='big')
+            ip_nodo = socket.inet_ntoa(datos[offset + 1:offset + 5])
+            print(f'[{id_nodo}:{ip_nodo}]')
+            self.nodos.append((id_nodo, ip_nodo))
 
     @staticmethod
     def _recibir_confirmacion(s):
@@ -74,10 +77,19 @@ class NodoAnillo:
                 raise ConexionTerminadaExcepcion
         return cachos
 
-    def _recibir_tokens(self):
-        tokens = []
-        # TODO Recibir tokens.
-        return tokens
+    def _procesar_token(self, direccion, token):
+        id_receptor = int.from_bytes(token[1:2], byteorder='big')
+        if id_receptor == self.id:
+            id_origen = int.from_bytes(token[:1], byteorder='big')
+            longitud = int.from_bytes(token[3:4], byteorder='big')
+            mensaje = token[4:4+longitud].decode()
+            print('De: <{}>\n{}\n'.format(id_origen, mensaje))
+
+            # token_vacio =
+        else:
+            pass
+
+        return b'OK'
 
 
 if __name__ == '__main__':

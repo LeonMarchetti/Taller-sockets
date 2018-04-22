@@ -4,6 +4,7 @@ Parámetros:
 * -i: Dirección IP (Opcional)
 * -p: Número de puerto (Opcional)
 """
+import binascii
 import getopt
 import os
 import random
@@ -24,9 +25,12 @@ class ServidorAnillo:
     def _proceso(self, direccion, datos):
         if datos == b'CON':
             nuevo_id = random.randint(1, 254)
+            print(f'id: {nuevo_id}')
+            print(f'ip: {direccion[0]}')
             nuevo_nodo = (nuevo_id, direccion[0])
 
             cantidad = len(self.nodos)
+            print(f'cantidad: {cantidad}')
             nuevo_pos = len(self.nodos)
 
             lista_nodos = b''
@@ -37,17 +41,23 @@ class ServidorAnillo:
                                socket.inet_aton(nodo[1])
 
                 if nodo[0] > nuevo_nodo[0] and nuevo_pos > i:
-                        nuevo_pos = i
+                    nuevo_pos = i
 
+            print(f'pos: {nuevo_pos}')
             self.nodos.insert(nuevo_pos, nuevo_nodo)
 
-            return (
-                nuevo_id.to_bytes(1, byteorder='big') +
-                cantidad.to_bytes(1, byteorder='big') +
-                lista_nodos
-                )
+            confirmacion = (nuevo_id.to_bytes(1, byteorder='big') +
+                            cantidad.to_bytes(1, byteorder='big') +
+                            nuevo_pos.to_bytes(1, byteorder='big') +
+                            b' ' +
+                            lista_nodos)
+
+            print('Enviando confirmacion:\n{}\n'.format(
+                binascii.hexlify(confirmacion)))
+
+            return confirmacion
         else:
-            pass
+            return datos
 
 
 if __name__ == '__main__':
