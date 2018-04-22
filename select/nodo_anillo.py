@@ -23,6 +23,7 @@ class NodoAnillo:
         # tupla (id, dirección ip)
         self.nodos = []
 
+        # Solicito conectarme al anillo:
         with socket.socket(socket.AF_INET,
                            socket.SOCK_STREAM) as socket_servidor:
             socket_servidor.connect(servidor_addr)
@@ -36,26 +37,6 @@ class NodoAnillo:
 
         self._procesar_confirmacion(paquete)
 
-        pid = os.fork()
-        if pid == 0:
-            # TODO Proceso hijo del nodo.
-            # Abro el socket para unirme al anillo:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM)\
-                    as self.socket_escucha:
-                self.socket_escucha.bind((self.direccion, NodoAnillo.puerto))
-                self.socket_escucha.listen(5)
-                try:
-                    while True:
-                        # Recibir mensaje/s:
-                        token = self._recibir_token()
-                        
-                except ConexionTerminadaExcepcion:
-                    print('Conexión terminada')
-                    return
-
-        else:
-            # TODO Proceso original del nodo.
-            pass
         # =====================================================================
 
     def _procesar_confirmacion(self, datos):
@@ -67,16 +48,10 @@ class NodoAnillo:
               f'total nodos: {cant_nodos}\n')
 
         for i in range(cant_nodos):
-            # offset = 4 * (i + 1)
-            # self.nodos.append((
-            #     socket.inet_ntoa(datos[offset:offset + 4]),
-            #    int.from_bytes(datos[offset + 4:offset + 6], byteorder='big'),
-            #     int.from_bytes(datos[offset + 6:offset + 7], byteorder='big')
-            # ))
             offset = 4 + 5 * i
             self.nodos.append((
-                socket.inet_ntoa(datos[offset:offset + 4]),
-                int.from_bytes(datos[offset + 4:offset + 5], byteorder='big')
+                int.from_bytes(datos[offset:offset + 1], byteorder='big'),
+                socket.inet_ntoa(datos[offset + 1:offset + 5])
             ))
 
     @staticmethod
@@ -99,29 +74,9 @@ class NodoAnillo:
                 raise ConexionTerminadaExcepcion
         return cachos
 
-    def _recibir_token(self):
+    def _recibir_tokens(self):
         tokens = []
-        cachos = b''
-        longitud = None
-        while True:
-            cacho = self.socket_escucha.recv(1024)
-            if cacho:
-                cachos += cacho
-                if not longitud:
-                    if len(cachos) >= 4:
-                        longitud = 4 + int.from_bytes(cachos[3:4],
-                                                      byteorder='big')
-                    else:
-                        continue
-
-                while len(cachos) >= longitud:
-                    tokens.append(cachos[:longitud])
-                    cachos = cachos[longitud:]
-
-                    if not cachos:
-                        return tokens
-            else:
-                raise ConexionTerminadaExcepcion
+        # TODO Recibir tokens.
         return tokens
 
 
